@@ -1,4 +1,4 @@
-import { validateGameRules, TTGameRules } from "./rules";
+import { assertGameRules, TTGameRules } from "./rules";
 
 export interface TTGame {
   homeScore: number;
@@ -24,7 +24,7 @@ export function getGameAdvantage(game: TTGame): "home" | "away" | undefined {
 }
 
 export function getGameWinner(game: TTGame, rules: TTGameRules): "home" | "away" | undefined {
-  validateGameRules(rules);
+  assertGameRules(rules);
   const scoreDiff = game.homeScore - game.awayScore;
 
   const hasMinimum = Math.max(game.homeScore, game.awayScore) >= rules.scoreMinimum;
