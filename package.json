@@ -4,7 +4,10 @@
   "description": "",
   "main": "jest.config.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:watch:coverage": "jest --watchAll --coverage"
   },
   "repository": {
     "type": "git",
