@@ -1,4 +1,5 @@
-import { TTGame, TTGameRules, getGameWinner, parseGameScore } from "./tt-game";
+import { assertSetRules, TTSetRules } from "./rules";
+import { TTGame, getGameWinner, parseGameScore } from "./tt-game";
 
 export interface TTSet {
   games: TTGame[];
@@ -11,14 +12,7 @@ export function parseSetScore(text: string): TTGame[] {
     .map(parseGameScore);
 }
 
-interface TTSetRules_BestOf {
-  gameRules: TTGameRules;
-  bestOf: number;
-}
-
-export type TTSetRules = TTSetRules_BestOf;
-
-export function getSetWinner(set: TTSet, rules: TTSetRules): "home" | "away" {
+export function getSetWinner(set: TTSet, rules: TTSetRules): "home" | "away" | undefined {
   assertSetRules(rules);
   const reqWins = Math.ceil(rules.bestOf / 2);
   let homeWins = 0;
@@ -34,8 +28,4 @@ export function getSetWinner(set: TTSet, rules: TTSetRules): "home" | "away" {
   }
 
   return undefined;
-}
-
-export function assertSetRules(rules: TTSetRules) {
-  if (!rules.gameRules) throw new Error("The gameRules are undefined in the setRules");
 }

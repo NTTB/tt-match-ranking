@@ -1,4 +1,5 @@
-import { TTGame, getGameAdvantage, getGameWinner, TTGameRules, parseGameScore } from './tt-game';
+import { TTGame, getGameAdvantage, getGameWinner, parseGameScore } from './tt-game';
+import { TTGameRules } from './rules';
 
 describe("getGameAdvantage(...)", () => {
   test.each`
@@ -18,16 +19,6 @@ describe("getGameAdvantage(...)", () => {
 });
 
 describe("getGameWinner(...)", () => {
-  test("should throw when scoreMinimum is lower than scoreDistance ", () => {
-    const call = () => getGameWinner(undefined, { scoreMinimum: 1, scoreDistance: 2 });
-    expect(call).toThrow(/The scoreMinimum in game-rules must be larger or equel to scoreDistance/);
-  });
-
-  test.each([0, -1])("should throw when scoreDistance is %d because that is too low", (scoreDistance) => {
-    const call = () => getGameWinner(undefined, { scoreMinimum: 0, scoreDistance });
-    expect(call).toThrow(/The scoreDistance in game-rules must be larger or equel to 1/);
-  });
-
   test.each`
     homeScore | awayScore | scoreMinimum | scoreDistance | expected
     ${0}      | ${0}      | ${11}        | ${2}          | ${undefined}
@@ -64,7 +55,7 @@ describe("parseGameScore(`...`)", () => {
     "00",
     "99",
   ])("Should throw", (input) => {
-    const act = () => parseGameScore(input);
+    const act = () => parseGameScore(input as string);
     expect(act).toThrow(/Unable to parse game score from: /);
   });
 

@@ -1,5 +1,6 @@
-import { TTSet, TTSetRules, getSetWinner, parseSetScore } from "./tt-set";
-import { parseGameScore, TTGameRules } from "./tt-game";
+import { TTSet, getSetWinner, parseSetScore } from "./tt-set";
+import { parseGameScore } from "./tt-game";
+import { TTGameRules, TTSetRules } from "./rules";
 
 const gameTo11: TTGameRules = { scoreMinimum: 11, scoreDistance: 2 };
 
@@ -47,13 +48,6 @@ describe("parseSetScore(...)", () => {
 });
 
 describe("getSetWinner(...)", () => {
-  test("should throw when gameRules are missing", () => {
-    var set: TTSet = { games: [] };
-    var rules: TTSetRules = { gameRules: undefined, bestOf: 1 };
-
-    expect(() => getSetWinner(set, rules)).toThrow(/The gameRules are undefined in the setRules/);
-  });
-
   test("should work with empty games array", () => {
     var set: TTSet = { games: [] };
     var rules: TTSetRules = { gameRules: gameTo11, bestOf: 1 };
