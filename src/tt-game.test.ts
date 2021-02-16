@@ -54,7 +54,7 @@ describe("parseGameScore(`...`)", () => {
     "11-11a",
     "00",
     "99",
-  ])("Should throw", (input) => {
+  ])("Should throw when input is `%p`", (input) => {
     const act = () => parseGameScore(input as string);
     expect(act).toThrow(/Unable to parse game score from: /);
   });
