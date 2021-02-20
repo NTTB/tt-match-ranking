@@ -12,7 +12,11 @@ export interface TTPlayerRank<T> {
   points: number;
 }
 
-export function generateMatchRank<T>(match: TTMatch<T>, matchRules: TTMatchRules, setRules: TTSetRules): TTMatchRank<T> {
+export function generateMatchRank<T>(
+  match: TTMatch<T>,
+  matchRules: TTMatchRules,
+  setRules: TTSetRules
+): TTMatchRank<T> {
   const hasTooManyUnplayedMatches: number[] = getPlayersWithTooManyUnplayedMatches<T>(
     match
   );
@@ -20,33 +24,55 @@ export function generateMatchRank<T>(match: TTMatch<T>, matchRules: TTMatchRules
     .getPlayers()
     .filter((x) => !hasTooManyUnplayedMatches.includes(x.id));
 
-  const unrankedPlayers = match.getPlayers().filter(p => !rankedPlayers.some(rp => rp.id === p.id));
+  const unrankedPlayers = match
+    .getPlayers()
+    .filter((p) => !rankedPlayers.some((rp) => rp.id === p.id));
 
-  const rankedSets = match.getSets()
-    .filter(s => !unrankedPlayers.some(p => p.id === s.awayPlayerId || p.id === s.homePlayerId));
+  const rankedSets = match
+    .getSets()
+    .filter(
+      (s) =>
+        !unrankedPlayers.some(
+          (p) => p.id === s.awayPlayerId || p.id === s.homePlayerId
+        )
+    );
 
-  const ranks = rankedPlayers.map((x): TTPlayerRank<T> => {
-    return {
-      id: x.id,
-      player: x.player,
-      points: 0
-    };
-  });
+  const ranks = rankedPlayers.map(
+    (x): TTPlayerRank<T> => {
+      return {
+        id: x.id,
+        player: x.player,
+        points: 0,
+      };
+    }
+  );
 
-  rankedSets.forEach(matchSet => {
+  rankedSets.forEach((matchSet) => {
     const winner = getSetWinner(matchSet.set, setRules);
-    const pointChanges: { id: number, score: number }[] = [];
+    const pointChanges: { id: number; score: number }[] = [];
     if (winner == "home") {
-      pointChanges.push({ id: matchSet.homePlayerId, score: matchRules.victoryPoints });
-      pointChanges.push({ id: matchSet.awayPlayerId, score: matchRules.defeatPoints });
+      pointChanges.push({
+        id: matchSet.homePlayerId,
+        score: matchRules.victoryPoints,
+      });
+      pointChanges.push({
+        id: matchSet.awayPlayerId,
+        score: matchRules.defeatPoints,
+      });
     }
     if (winner == "away") {
-      pointChanges.push({ id: matchSet.awayPlayerId, score: matchRules.victoryPoints });
-      pointChanges.push({ id: matchSet.homePlayerId, score: matchRules.defeatPoints });
+      pointChanges.push({
+        id: matchSet.awayPlayerId,
+        score: matchRules.victoryPoints,
+      });
+      pointChanges.push({
+        id: matchSet.homePlayerId,
+        score: matchRules.defeatPoints,
+      });
     }
 
-    pointChanges.forEach(change => {
-      const rank = ranks.find(x => x.id == change.id);
+    pointChanges.forEach((change) => {
+      const rank = ranks.find((x) => x.id == change.id);
       if (rank) {
         rank.points += change.score;
       } else {
