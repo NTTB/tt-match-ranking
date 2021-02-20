@@ -3,13 +3,23 @@ import { TTGame, getGameWinner, parseGameScore } from "./tt-game";
 
 export interface TTSet {
   games: TTGame[];
+  walkover?: "home" | "away";
 }
 
-export function parseSetScore(text: string): TTGame[] {
-  return text.split(",")
+export function parseSetScore(text: string): TTSet {
+  if (text === "wo:home") {
+    return { walkover: "home", games: [] };
+  }
+
+  if (text === "wo:away") {
+    return { walkover: "away", games: [] };
+  }
+
+  const games = text.split(",")
     .map(x => x.trim())
     .filter(x => x.length)
     .map(parseGameScore);
+  return { games };
 }
 
 export function getSetWinner(set: TTSet, rules: TTSetRules): "home" | "away" | undefined {
