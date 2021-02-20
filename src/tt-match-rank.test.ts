@@ -1,5 +1,5 @@
 import { TTMatch } from "./tt-match";
-import { generateMatchRank } from "./tt-match-rank";
+import { generateMatchRank, TTMatchRank } from "./tt-match-rank";
 import { parseSetScore } from "./tt-set";
 
 describe("generateMatchRank(...)", () => {
@@ -9,13 +9,19 @@ describe("generateMatchRank(...)", () => {
   });
 
   test("should return an empty array when match contains no players", () => {
-    const result = generateMatchRank(match);
+    const result = generateMatchRank(match,
+      { victoryPoints: 2, defeatPoints: 1 },
+      { bestOf: 1, gameRules: { scoreDistance: 2, scoreMinimum: 11 } }
+    );
     expect(result.ranked).toEqual([]);
   });
 
   test("should return a single item when only one player is added", () => {
     match.addPlayer("Player 1");
-    const result = generateMatchRank(match);
+    const result = generateMatchRank(match,
+      { victoryPoints: 2, defeatPoints: 1 },
+      { bestOf: 1, gameRules: { scoreDistance: 2, scoreMinimum: 11 } }
+    );
     expect(result.ranked.length).toBe(1);
     expect(result.ranked[0].player).toBe("Player 1");
   });
@@ -23,7 +29,10 @@ describe("generateMatchRank(...)", () => {
   test("should return both items when two players were added", () => {
     match.addPlayer("Player 1");
     match.addPlayer("Player 2");
-    const result = generateMatchRank(match);
+    const result = generateMatchRank(match,
+      { victoryPoints: 2, defeatPoints: 1 },
+      { bestOf: 1, gameRules: { scoreDistance: 2, scoreMinimum: 11 } }
+    );
     expect(result.ranked.length).toBe(2);
     expect(result.ranked[0].player).toBe("Player 1");
     expect(result.ranked[1].player).toBe("Player 2");
@@ -32,6 +41,8 @@ describe("generateMatchRank(...)", () => {
   describe.each`
     set1         | set2         | set3         | ranked              | unranked
     ${""}        | ${""}        | ${""}        | ${["home", "away"]} | ${[]}
+    ${"0-0"}     | ${"0-0"}     | ${"0-0"}     | ${["home", "away"]} | ${[]}
+    ${""}        | ${"0-0"}     | ${""}        | ${["home", "away"]} | ${[]}
     ${""}        | ${""}        | ${"wo:home"} | ${["home", "away"]} | ${[]}
     ${""}        | ${""}        | ${"wo:away"} | ${["home", "away"]} | ${[]}
     ${""}        | ${"wo:home"} | ${"wo:home"} | ${[]}               | ${["home", "away"]}
@@ -53,14 +64,20 @@ describe("generateMatchRank(...)", () => {
       });
 
       test(`${ranked.join(",") || "none"} should be ranked`, () => {
-        const result = generateMatchRank(match);
+        const result = generateMatchRank(match,
+          { victoryPoints: 2, defeatPoints: 1 },
+          { bestOf: 1, gameRules: { scoreDistance: 2, scoreMinimum: 11 } }
+        );
         ranked.forEach((element: "home" | "away") => {
           expect(result.ranked.map((x) => x.player)).toContain(element);
         });
       });
 
       test(`${unranked.join(",") || "none"} must NOT be ranked`, () => {
-        const result = generateMatchRank(match);
+        const result = generateMatchRank(match,
+          { victoryPoints: 2, defeatPoints: 1 },
+          { bestOf: 1, gameRules: { scoreDistance: 2, scoreMinimum: 11 } }
+        );
         unranked.forEach((element: "home" | "away") => {
           expect(result.ranked.map((x) => x.player)).not.toContain(element);
         });
@@ -107,7 +124,10 @@ describe("generateMatchRank(...)", () => {
       match.addSet(parseSetScore(s2_3), p2, p3);
       match.addSet(parseSetScore(s2_4), p2, p4);
       match.addSet(parseSetScore(s3_4), p3, p4);
-      const result = generateMatchRank(match);
+      const result = generateMatchRank(match,
+        { victoryPoints: 2, defeatPoints: 1 },
+        { bestOf: 1, gameRules: { scoreDistance: 2, scoreMinimum: 11 } }
+      );
 
       for (let i = 0; i < ranked.length; ++i) {
         const player = ranked[i];
@@ -128,4 +148,37 @@ describe("generateMatchRank(...)", () => {
       });
     }
   );
+
+  describe.each`
+    a_vs_b      | order 
+    ${"11-0"}   | ${["A", "B"]}
+    ${"0-11"}   | ${["B", "A"]}
+  `("Rank order of two players [$a_vs_b]", ({ a_vs_b, order }) => {
+    let result: TTMatchRank<string>;
+    beforeEach(() => {
+      const A = match.addPlayer("A");
+      const B = match.addPlayer("B");
+      match.addSet(parseSetScore(a_vs_b), A, B);
+      result = generateMatchRank(match,
+        { victoryPoints: 2, defeatPoints: 1 },
+        { bestOf: 1, gameRules: { scoreDistance: 2, scoreMinimum: 11 } }
+      );
+    });
+
+    it("should have two ranked players", () => {
+      expect(result.ranked).toHaveLength(2);
+    });
+
+    it('Should be ordered as ' + order.join(), () => {
+      expect(result.ranked.map(x => x.player)).toEqual(order);
+    });
+
+    it('Winner has two points', () => {
+      expect(result.ranked[0].points).toEqual(2);
+    });
+
+    it('Loser has a single point', () => {
+      expect(result.ranked[1].points).toEqual(1);
+    });
+  });
 });
