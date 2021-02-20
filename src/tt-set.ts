@@ -15,14 +15,18 @@ export function parseSetScore(text: string): TTSet {
     return { walkover: "away", games: [] };
   }
 
-  const games = text.split(",")
-    .map(x => x.trim())
-    .filter(x => x.length)
+  const games = text
+    .split(",")
+    .map((x) => x.trim())
+    .filter((x) => x.length)
     .map(parseGameScore);
   return { games };
 }
 
-export function getSetWinner(set: TTSet, rules: TTSetRules): "home" | "away" | undefined {
+export function getSetWinner(
+  set: TTSet,
+  rules: TTSetRules
+): "home" | "away" | undefined {
   assertSetRules(rules);
   const reqWins = Math.ceil(rules.bestOf / 2);
   let homeWins = 0;

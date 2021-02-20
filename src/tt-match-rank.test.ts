@@ -41,70 +41,91 @@ describe("generateMatchRank(...)", () => {
     ${"wo:home"} | ${"wo:home"} | ${"wo:away"} | ${[]}               | ${["home", "away"]}
     ${"wo:home"} | ${"wo:away"} | ${"wo:away"} | ${[]}               | ${["home", "away"]}
     ${"wo:home"} | ${""}        | ${"wo:away"} | ${[]}               | ${["home", "away"]}
-  `("When sets are [$set1, $set2, $set3]", ({ set1, set2, set3, ranked, unranked }) => {
-    beforeEach(() => {
-      const p1 = match.addPlayer("home");
-      const p2 = match.addPlayer("away");
-      match.addSet(parseSetScore(set1), p1, p2);
-      match.addSet(parseSetScore(set2), p1, p2);
-      match.addSet(parseSetScore(set3), p1, p2);
-    });
-
-    test(`${ranked.join(",") || "none"} should be ranked`, () => {
-      const result = generateMatchRank(match);
-      ranked.forEach((element: "home" | "away") => {
-        expect(result.ranked.map(x => x.player)).toContain(element);
+  `(
+    "When sets are [$set1, $set2, $set3]",
+    ({ set1, set2, set3, ranked, unranked }) => {
+      beforeEach(() => {
+        const p1 = match.addPlayer("home");
+        const p2 = match.addPlayer("away");
+        match.addSet(parseSetScore(set1), p1, p2);
+        match.addSet(parseSetScore(set2), p1, p2);
+        match.addSet(parseSetScore(set3), p1, p2);
       });
-    });
 
-
-    test(`${unranked.join(",") || "none"} must NOT be ranked`, () => {
-      const result = generateMatchRank(match);
-      unranked.forEach((element: "home" | "away") => {
-        expect(result.ranked.map(x => x.player)).not.toContain(element);
+      test(`${ranked.join(",") || "none"} should be ranked`, () => {
+        const result = generateMatchRank(match);
+        ranked.forEach((element: "home" | "away") => {
+          expect(result.ranked.map((x) => x.player)).toContain(element);
+        });
       });
-    });
-  });
+
+      test(`${unranked.join(",") || "none"} must NOT be ranked`, () => {
+        const result = generateMatchRank(match);
+        unranked.forEach((element: "home" | "away") => {
+          expect(result.ranked.map((x) => x.player)).not.toContain(element);
+        });
+      });
+    }
+  );
 
   describe.each`
-    s1_2         | s1_3         | s1_4         | s2_3          | s2_4         | s3_4         | ranked    | unranked 
-    ${"wo:home"} | ${"wo:home"} | ${"wo:home"} | ${"wo:home"}  | ${"wo:home"} | ${"wo:home"} | ${""}     | ${"ABCD"}
-    ${"0-11"}    | ${"0-11"}    | ${"0-11"}    | ${"0-11"}     | ${"0-11"}    | ${"0-11"}    | ${"ABCD"} | ${""}
-    ${"wo:home"} | ${"wo:home"} | ${"wo:home"} | ${"0-11"}     | ${"0-11"}    | ${"0-11"}    | ${"BCD"}  | ${"A"}
-    ${"wo:away"} | ${"wo:away"} | ${"wo:away"} | ${"0-11"}     | ${"0-11"}    | ${"0-11"}    | ${"BCD"}  | ${"A"}
-    ${"wo:away"} | ${"wo:away"} | ${"wo:away"} | ${"wo:away"}  | ${"0-11"}    | ${"0-11"}    | ${"D"}    | ${"ABC"}
-      `("Given sets are [$s1_2, $s1_3, $s1_4, $s2_3, $s2_4, $s3_4]", (
-    { s1_2, s1_3, s1_4, s2_3, s2_4, s3_4, ranked, unranked }: { s1_2: string, s1_3: string, s1_4: string, s2_3: string, s2_4: string, s3_4: string, ranked: string, unranked: string }
-  ) => {
-    match = new TTMatch<string>();
-    const p1 = match.addPlayer("A");
-    const p2 = match.addPlayer("B");
-    const p3 = match.addPlayer("C");
-    const p4 = match.addPlayer("D");
-    match.addSet(parseSetScore(s1_2), p1, p2);
-    match.addSet(parseSetScore(s1_3), p1, p3);
-    match.addSet(parseSetScore(s1_4), p1, p4);
-    match.addSet(parseSetScore(s2_3), p2, p3);
-    match.addSet(parseSetScore(s2_4), p2, p4);
-    match.addSet(parseSetScore(s3_4), p3, p4);
-    const result = generateMatchRank(match);
+    s1_2         | s1_3         | s1_4         | s2_3         | s2_4         | s3_4         | ranked    | unranked
+    ${"wo:home"} | ${"wo:home"} | ${"wo:home"} | ${"wo:home"} | ${"wo:home"} | ${"wo:home"} | ${""}     | ${"ABCD"}
+    ${"0-11"}    | ${"0-11"}    | ${"0-11"}    | ${"0-11"}    | ${"0-11"}    | ${"0-11"}    | ${"ABCD"} | ${""}
+    ${"wo:home"} | ${"wo:home"} | ${"wo:home"} | ${"0-11"}    | ${"0-11"}    | ${"0-11"}    | ${"BCD"}  | ${"A"}
+    ${"wo:away"} | ${"wo:away"} | ${"wo:away"} | ${"0-11"}    | ${"0-11"}    | ${"0-11"}    | ${"BCD"}  | ${"A"}
+    ${"wo:away"} | ${"wo:away"} | ${"wo:away"} | ${"wo:away"} | ${"0-11"}    | ${"0-11"}    | ${"D"}    | ${"ABC"}
+  `(
+    "Given sets are [$s1_2, $s1_3, $s1_4, $s2_3, $s2_4, $s3_4]",
+    ({
+      s1_2,
+      s1_3,
+      s1_4,
+      s2_3,
+      s2_4,
+      s3_4,
+      ranked,
+      unranked,
+    }: {
+      s1_2: string;
+      s1_3: string;
+      s1_4: string;
+      s2_3: string;
+      s2_4: string;
+      s3_4: string;
+      ranked: string;
+      unranked: string;
+    }) => {
+      match = new TTMatch<string>();
+      const p1 = match.addPlayer("A");
+      const p2 = match.addPlayer("B");
+      const p3 = match.addPlayer("C");
+      const p4 = match.addPlayer("D");
+      match.addSet(parseSetScore(s1_2), p1, p2);
+      match.addSet(parseSetScore(s1_3), p1, p3);
+      match.addSet(parseSetScore(s1_4), p1, p4);
+      match.addSet(parseSetScore(s2_3), p2, p3);
+      match.addSet(parseSetScore(s2_4), p2, p4);
+      match.addSet(parseSetScore(s3_4), p3, p4);
+      const result = generateMatchRank(match);
 
-        for (let i = 0; i < ranked.length; ++i) {
-      const player = ranked[i];
-      test(`player ${player} should be ranked`, () => {
-        expect(result.ranked.map(x => x.player)).toContain(player);
+      for (let i = 0; i < ranked.length; ++i) {
+        const player = ranked[i];
+        test(`player ${player} should be ranked`, () => {
+          expect(result.ranked.map((x) => x.player)).toContain(player);
+        });
+      }
+
+      for (let i = 0; i < unranked.length; ++i) {
+        const player = unranked[i];
+        test(`player ${player} should NOT be ranked`, () => {
+          expect(result.ranked.map((x) => x.player)).not.toContain(player);
+        });
+      }
+
+      test(`total ranked players should be ${ranked.length}`, () => {
+        expect(result.ranked).toHaveLength(ranked.length);
       });
     }
-
-        for (let i = 0; i < unranked.length; ++i) {
-      const player = unranked[i];
-      test(`player ${player} should NOT be ranked`, () => {
-        expect(result.ranked.map(x => x.player)).not.toContain(player);
-      });
-    }
-
-    test(`total ranked players should be ${ranked.length}`, () => {
-      expect(result.ranked).toHaveLength(ranked.length);
-    });
-  });
+  );
 });

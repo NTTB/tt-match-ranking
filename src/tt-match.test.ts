@@ -33,7 +33,9 @@ describe("Match and players", () => {
 
   test("Adding the same player twice should throw an error", () => {
     match.addPlayer(p1);
-    expect(() => match.addPlayer(p1)).toThrowError(/This player was already added/);
+    expect(() => match.addPlayer(p1)).toThrowError(
+      /This player was already added/
+    );
   });
 
   test("Adding a player should return the an id that increases everytime", () => {
@@ -73,7 +75,6 @@ describe("Match and players", () => {
   });
 });
 
-
 describe("Match and sets", () => {
   let match: TTMatch<string>;
   beforeEach(() => {
@@ -84,10 +85,11 @@ describe("Match and sets", () => {
     expect(match.getSets().length).toBe(0);
   });
 
-
   test("Should throw when adding a set with the same playerId", () => {
     const act = () => match.addSet({ games: [] }, 0, 0);
-    expect(act).toThrowError(/The homePlayerId and awayPlayerId cannot be the same/);
+    expect(act).toThrowError(
+      /The homePlayerId and awayPlayerId cannot be the same/
+    );
   });
 
   test("Should throw when adding a set with homePlayerId not registered", () => {
@@ -167,11 +169,14 @@ describe("Match and sets", () => {
       ${3} | ${s3} | ${1}         | ${4}
       ${4} | ${s4} | ${1}         | ${5}
       ${5} | ${s5} | ${2}         | ${1}
-    `("should return $set with as versus between p$homePlayerId a p$awayPlayerId", ({ id, set, homePlayerId, awayPlayerId }) => {
-      const result = match.getSetById(id);
-      expect(result.set).toBe(set);
-      expect(result.homePlayerId).toBe(homePlayerId);
-      expect(result.awayPlayerId).toBe(awayPlayerId);
-    });
+    `(
+      "should return $set with as versus between p$homePlayerId a p$awayPlayerId",
+      ({ id, set, homePlayerId, awayPlayerId }) => {
+        const result = match.getSetById(id);
+        expect(result.set).toBe(set);
+        expect(result.homePlayerId).toBe(homePlayerId);
+        expect(result.awayPlayerId).toBe(awayPlayerId);
+      }
+    );
   });
 });

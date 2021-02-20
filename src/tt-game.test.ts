@@ -1,5 +1,10 @@
-import { TTGame, getGameAdvantage, getGameWinner, parseGameScore } from './tt-game';
-import { TTGameRules } from './rules';
+import {
+  TTGame,
+  getGameAdvantage,
+  getGameWinner,
+  parseGameScore,
+} from "./tt-game";
+import { TTGameRules } from "./rules";
 
 describe("getGameAdvantage(...)", () => {
   test.each`
@@ -12,10 +17,13 @@ describe("getGameAdvantage(...)", () => {
     ${0}      | ${99}     | ${"away"}
     ${98}     | ${99}     | ${"away"}
     ${99}     | ${99}     | ${undefined}
-  `(`At $homeScore - $awayScore the advantage is $expected`, ({ homeScore, awayScore, expected }) => {
-    const game: TTGame = { homeScore, awayScore };
-    expect(getGameAdvantage(game)).toBe(expected);
-  });
+  `(
+    `At $homeScore - $awayScore the advantage is $expected`,
+    ({ homeScore, awayScore, expected }) => {
+      const game: TTGame = { homeScore, awayScore };
+      expect(getGameAdvantage(game)).toBe(expected);
+    }
+  );
 });
 
 describe("getGameWinner(...)", () => {
@@ -34,12 +42,14 @@ describe("getGameWinner(...)", () => {
     ${10}     | ${11}     | ${11}        | ${1}          | ${"away"}
     ${12}     | ${10}     | ${11}        | ${2}          | ${"home"}
     ${10}     | ${12}     | ${11}        | ${2}          | ${"away"}
-  `(`Game at $homeScore-$awayScore (req: $scoreMinimum, min: $scoreDistance) the winner is $expected`,
+  `(
+    `Game at $homeScore-$awayScore (req: $scoreMinimum, min: $scoreDistance) the winner is $expected`,
     ({ homeScore, awayScore, scoreMinimum, scoreDistance, expected }) => {
       const game: TTGame = { homeScore, awayScore };
       const rules: TTGameRules = { scoreMinimum, scoreDistance };
       expect(getGameWinner(game, rules)).toBe(expected);
-    });
+    }
+  );
 });
 
 describe("parseGameScore(`...`)", () => {
@@ -60,14 +70,14 @@ describe("parseGameScore(`...`)", () => {
   });
 
   test.each`
-  home  | away  | input
-  ${0}  | ${0}  | ${"0-0"}
-  ${11} | ${0}  | ${"11-0"}
-  ${0}  | ${11} | ${"0-11"}
-  ${10} | ${12} | ${"10-12"}
+    home  | away  | input
+    ${0}  | ${0}  | ${"0-0"}
+    ${11} | ${0}  | ${"11-0"}
+    ${0}  | ${11} | ${"0-11"}
+    ${10} | ${12} | ${"10-12"}
   `("It should parse $input as $home-$away", ({ home, away, input }) => {
     const result = parseGameScore(input);
     expect(result.homeScore).toBe(home);
     expect(result.awayScore).toBe(away);
   });
-})
+});

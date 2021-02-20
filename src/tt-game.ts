@@ -13,7 +13,7 @@ export function parseGameScore(text: string): TTGame {
 
   return {
     homeScore: parseInt(parsed.groups["home"]),
-    awayScore: parseInt(parsed.groups['away'])
+    awayScore: parseInt(parsed.groups["away"]),
   };
 }
 
@@ -23,11 +23,15 @@ export function getGameAdvantage(game: TTGame): "home" | "away" | undefined {
   return undefined;
 }
 
-export function getGameWinner(game: TTGame, rules: TTGameRules): "home" | "away" | undefined {
+export function getGameWinner(
+  game: TTGame,
+  rules: TTGameRules
+): "home" | "away" | undefined {
   assertGameRules(rules);
   const scoreDiff = game.homeScore - game.awayScore;
 
-  const hasMinimum = Math.max(game.homeScore, game.awayScore) >= rules.scoreMinimum;
+  const hasMinimum =
+    Math.max(game.homeScore, game.awayScore) >= rules.scoreMinimum;
   const hasDistance = Math.abs(scoreDiff) >= rules.scoreDistance;
 
   if (hasMinimum && hasDistance) {

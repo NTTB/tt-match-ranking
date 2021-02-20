@@ -11,8 +11,10 @@ export interface TTMatchRules {
 }
 
 export function assertMatchRules(rules: TTMatchRules): void {
-  if (rules.victoryPoints <= rules.defeatPoints) throw new Error("The victoryPoints should be higher than the defeatPoints");
-  if (rules.defeatPoints < 0) throw new Error("The defeatPoints must be zero or positive");
+  if (rules.victoryPoints <= rules.defeatPoints)
+    throw new Error("The victoryPoints should be higher than the defeatPoints");
+  if (rules.defeatPoints < 0)
+    throw new Error("The defeatPoints must be zero or positive");
 }
 
 export function parseMatchRules(text: string): TTMatchRules {
@@ -23,6 +25,6 @@ export function parseMatchRules(text: string): TTMatchRules {
 
   return {
     victoryPoints: parseInt(parsed.groups["victoryPoints"]),
-    defeatPoints: parseInt(parsed.groups["defeatPoints"])
+    defeatPoints: parseInt(parsed.groups["defeatPoints"]),
   };
 }
