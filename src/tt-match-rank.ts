@@ -1,6 +1,6 @@
-import { TTGameRules, TTMatchRules, TTSetRules } from "./rules";
+import { TTMatchRules, TTSetRules } from "./rules";
 import { getSetWinner } from "./tt-set";
-import { TTMatch } from "./tt-match";
+import { TTMatch, TTMatchSet } from "./tt-match";
 
 export interface TTMatchRank<T> {
   ranked: TTPlayerRank<T>[];
@@ -17,6 +17,46 @@ export function generateMatchRank<T>(
   matchRules: TTMatchRules,
   setRules: TTSetRules
 ): TTMatchRank<T> {
+  const { unrankedPlayers, rankedPlayers } = splitRankedAndUnranked<T>(match);
+  const ranked = rankedPlayers.map(
+    (x): TTPlayerRank<T> => {
+      return {
+        id: x.id,
+        player: x.player,
+        points: 0,
+      };
+    }
+  );
+
+  const rankedSets = getRankedSets<T>(match, unrankedPlayers);
+  const pointChanges = getPointChanges(rankedSets, matchRules, setRules);
+  ranked.forEach((r) => {
+    pointChanges
+      .filter((x) => x.id === r.id)
+      .forEach((change) => {
+        r.points += change.points;
+      });
+  });
+
+  ranked.sort((a, b) => b.points - a.points);
+  return { ranked };
+}
+
+function getRankedSets<T>(
+  match: TTMatch<T>,
+  unrankedPlayers: { id: number; player: T }[]
+) {
+  return match
+    .getSets()
+    .filter(
+      (s) =>
+        !unrankedPlayers.some(
+          (p) => p.id === s.awayPlayerId || p.id === s.homePlayerId
+        )
+    );
+}
+
+function splitRankedAndUnranked<T>(match: TTMatch<T>) {
   const hasTooManyUnplayedMatches: number[] = getPlayersWithTooManyUnplayedMatches<T>(
     match
   );
@@ -27,62 +67,40 @@ export function generateMatchRank<T>(
   const unrankedPlayers = match
     .getPlayers()
     .filter((p) => !rankedPlayers.some((rp) => rp.id === p.id));
+  return { unrankedPlayers, rankedPlayers };
+}
 
-  const rankedSets = match
-    .getSets()
-    .filter(
-      (s) =>
-        !unrankedPlayers.some(
-          (p) => p.id === s.awayPlayerId || p.id === s.homePlayerId
-        )
-    );
-
-  const ranks = rankedPlayers.map(
-    (x): TTPlayerRank<T> => {
-      return {
-        id: x.id,
-        player: x.player,
-        points: 0,
-      };
-    }
-  );
-
+function getPointChanges(
+  rankedSets: TTMatchSet[],
+  matchRules: TTMatchRules,
+  setRules: TTSetRules
+) {
+  const pointChanges: { id: number; points: number }[] = [];
   rankedSets.forEach((matchSet) => {
     const winner = getSetWinner(matchSet.set, setRules);
-    const pointChanges: { id: number; score: number }[] = [];
     if (winner == "home") {
       pointChanges.push({
         id: matchSet.homePlayerId,
-        score: matchRules.victoryPoints,
+        points: matchRules.victoryPoints,
       });
       pointChanges.push({
         id: matchSet.awayPlayerId,
-        score: matchRules.defeatPoints,
+        points: matchRules.defeatPoints,
       });
     }
     if (winner == "away") {
       pointChanges.push({
         id: matchSet.awayPlayerId,
-        score: matchRules.victoryPoints,
+        points: matchRules.victoryPoints,
       });
       pointChanges.push({
         id: matchSet.homePlayerId,
-        score: matchRules.defeatPoints,
+        points: matchRules.defeatPoints,
       });
     }
-
-    pointChanges.forEach((change) => {
-      const rank = ranks.find((x) => x.id == change.id);
-      if (rank) {
-        rank.points += change.score;
-      } else {
-        throw new Error("Unable to find ranked player of ranked match");
-      }
-    });
   });
 
-  const sortedRanks = ranks.sort((a, b) => b.points - a.points);
-  return { ranked: sortedRanks };
+  return pointChanges;
 }
 
 function getPlayersWithTooManyUnplayedMatches<T>(match: TTMatch<T>) {
