@@ -1,2 +1,8 @@
 [*.ts]
 tab_width = 2
+
+[*.js]
+tab_width = 2
+
+[*.json]
+tab_width = 2
