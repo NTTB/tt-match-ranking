@@ -9,13 +9,13 @@ describe("generateMatchRank(...)", () => {
   });
 
   test("should return an empty array when match contains no players", () => {
-    var result = generateMatchRank(match);
+    const result = generateMatchRank(match);
     expect(result.ranked).toEqual([]);
   });
 
   test("should return a single item when only one player is added", () => {
     match.addPlayer("Player 1");
-    var result = generateMatchRank(match);
+    const result = generateMatchRank(match);
     expect(result.ranked.length).toBe(1);
     expect(result.ranked[0].player).toBe("Player 1");
   });
@@ -23,7 +23,7 @@ describe("generateMatchRank(...)", () => {
   test("should return both items when two players were added", () => {
     match.addPlayer("Player 1");
     match.addPlayer("Player 2");
-    var result = generateMatchRank(match);
+    const result = generateMatchRank(match);
     expect(result.ranked.length).toBe(2);
     expect(result.ranked[0].player).toBe("Player 1");
     expect(result.ranked[1].player).toBe("Player 2");
@@ -89,14 +89,14 @@ describe("generateMatchRank(...)", () => {
     match.addSet(parseSetScore(s3_4), p3, p4);
     const result = generateMatchRank(match);
 
-    for (var i = 0; i < ranked.length; ++i) {
+        for (let i = 0; i < ranked.length; ++i) {
       const player = ranked[i];
       test(`player ${player} should be ranked`, () => {
         expect(result.ranked.map(x => x.player)).toContain(player);
       });
     }
 
-    for (var i = 0; i < unranked.length; ++i) {
+        for (let i = 0; i < unranked.length; ++i) {
       const player = unranked[i];
       test(`player ${player} should NOT be ranked`, () => {
         expect(result.ranked.map(x => x.player)).not.toContain(player);

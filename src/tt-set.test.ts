@@ -52,18 +52,18 @@ describe("parseSetScore(...)", () => {
   test.each`
   walkover  | input
   ${"home"} | ${"wo:home"}
-  ${"away"} | ${"wo:away"}`
-    ("When input is \"$input\" it should have no game and set winner by walkover to $walkover", ({ walkover, input }) => {
-      const set = parseSetScore(input);
-      expect(set.games.length).toBe(0);
-      expect(set.walkover).toBe(walkover);
-    });
+  ${"away"} | ${"wo:away"}
+  `("When input is \"$input\" it should have no game and set winner by walkover to $walkover", ({ walkover, input }) => {
+    const set = parseSetScore(input);
+    expect(set.games.length).toBe(0);
+    expect(set.walkover).toBe(walkover);
+  });
 });
 
 describe("getSetWinner(...)", () => {
   test("should work with empty games array", () => {
-    var set: TTSet = { games: [] };
-    var rules: TTSetRules = { gameRules: gameTo11, bestOf: 1 };
+    const set: TTSet = { games: [] };
+    const rules: TTSetRules = { gameRules: gameTo11, bestOf: 1 };
     expect(getSetWinner(set, rules)).toBeUndefined();
   });
 
@@ -79,8 +79,8 @@ describe("getSetWinner(...)", () => {
     ${3}   | ${"home"}    | ${"11-0,  0-11, 11-0, 10-12, 10-12"}
     ${5}   | ${"away"}    | ${"11-0, 10-12, 11-0, 10-12, 10-12"}
   `("With $bestOf and games of $games the winner is $winner", ({ bestOf, winner, games }) => {
-    var rules: TTSetRules = { bestOf: bestOf, gameRules: gameTo11 };
-    var set: TTSet = parseSetScore(games);
+    const rules: TTSetRules = { bestOf: bestOf, gameRules: gameTo11 };
+    const set: TTSet = parseSetScore(games);
     expect(getSetWinner(set, rules)).toBe(winner);
   });
 });

@@ -18,12 +18,12 @@ describe("parseMatchRules input validation", () => {
   });
 
   test("parseMatchRules(null) should throw", () => {
-    const act = () => parseMatchRules(null as any);
+    const act = () => parseMatchRules(null as unknown as string);
     expect(act).toThrowError(/Unable to parse match rules from/);
   });
 
   test("parseMatchRules(undefined) should throw", () => {
-    const act = () => parseMatchRules(undefined as any);
+    const act = () => parseMatchRules(undefined as unknown as string);
     expect(act).toThrowError(/Unable to parse match rules from/);
   });
 

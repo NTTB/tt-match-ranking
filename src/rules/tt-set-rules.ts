@@ -7,6 +7,6 @@ interface TTSetRules_BestOf {
 
 export type TTSetRules = TTSetRules_BestOf;
 
-export function assertSetRules(rules: TTSetRules) {
+export function assertSetRules(rules: TTSetRules): void {
   if (!rules.gameRules) throw new Error("The gameRules are undefined in the setRules");
 }

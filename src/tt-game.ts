@@ -6,7 +6,7 @@ export interface TTGame {
 }
 
 export function parseGameScore(text: string): TTGame {
-  const parsed = /^(?<home>\d+)\-(?<away>\d+)$/.exec(text);
+  const parsed = /^(?<home>\d+)-(?<away>\d+)$/.exec(text);
   if (!parsed || !parsed.groups) {
     throw new Error("Unable to parse game score from: " + text);
   }
