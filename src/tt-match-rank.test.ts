@@ -188,4 +188,66 @@ describe("generateMatchRank(...)", () => {
       expect(result.ranked[1].points).toEqual(1);
     });
   });
+
+  describe.each`
+    a_vs_b    | a_vs_c    | a_vs_d    | b_vs_c    | b_vs_d    | c_vs_d       | rankedOrder | VPA  | VPB  | VPC  | VPD
+    ${""}     | ${""}     | ${""}     | ${""}     | ${""}     | ${""}        | ${"ABCD"}   | ${0} | ${0} | ${0} | ${0} 
+    ${"0-11"} | ${"0-11"} | ${"0-11"} | ${"0-11"} | ${"0-11"} | ${"0-11"}    | ${"DCBA"}   | ${3} | ${4} | ${5} | ${6}
+    ${"11-0"} | ${"0-11"} | ${"11-0"} | ${"11-0"} | ${"11-0"} | ${"0-11"}    | ${"ABCD"}   | ${5} | ${5} | ${4} | ${4}
+    ${"0-11"} | ${"11-0"} | ${"11-0"} | ${"11-0"} | ${"0-11"} | ${"0-11"}    | ${"ABDC"}   | ${5} | ${5} | ${3} | ${5}
+    ${"0-11"} | ${"11-0"} | ${"11-0"} | ${"11-0"} | ${"0-11"} | ${"wo:away"} | ${"ABDC"}   | ${5} | ${5} | ${2} | ${5}
+  `("Rank order of four players [$a_vs_b, $a_vs_c, $a_vs_d, $b_vs_c, $b_vs_d, $c_vs_d]", ({
+    a_vs_b,
+    a_vs_c,
+    a_vs_d,
+    b_vs_c,
+    b_vs_d,
+    c_vs_d,
+    rankedOrder,
+    VPA, VPB, VPC, VPD,
+  }) => {
+    let result: TTMatchRank<string>;
+    beforeEach(() => {
+      const A = match.addPlayer("A");
+      const B = match.addPlayer("B");
+      const C = match.addPlayer("C");
+      const D = match.addPlayer("D");
+      match.addSet(parseSetScore(a_vs_b), A, B);
+      match.addSet(parseSetScore(a_vs_c), A, C);
+      match.addSet(parseSetScore(a_vs_d), A, D);
+      match.addSet(parseSetScore(b_vs_c), B, C);
+      match.addSet(parseSetScore(b_vs_d), B, D);
+      match.addSet(parseSetScore(c_vs_d), C, D);
+      result = generateMatchRank(
+        match,
+        { victoryPoints: 2, defeatPoints: 1 },
+        { bestOf: 1, gameRules: { scoreDistance: 2, scoreMinimum: 11 } }
+      );
+    });
+
+    it(`should have ${rankedOrder.length} ranked players`, () => {
+      expect(result.ranked).toHaveLength(rankedOrder.length);
+    });
+
+    it(`Should be ordered as ${rankedOrder}`, () => {
+      expect(result.ranked.map((x) => x.player).join("")).toEqual(rankedOrder);
+    });
+
+    it(`should have given player A: ${VPA} points`, () => {
+      const playerResult = result.ranked.find(x => x.player === "A");
+      expect(playerResult?.points).toBe(VPA);
+    });
+    it(`should have given player B: ${VPB} points`, () => {
+      const playerResult = result.ranked.find(x => x.player === "B");
+      expect(playerResult?.points).toBe(VPB);
+    });
+    it(`should have given player C: ${VPC} points`, () => {
+      const playerResult = result.ranked.find(x => x.player === "C");
+      expect(playerResult?.points).toBe(VPC);
+    });
+    it(`should have given player D: ${VPD} points`, () => {
+      const playerResult = result.ranked.find(x => x.player === "D");
+      expect(playerResult?.points).toBe(VPD);
+    });
+  });
 });

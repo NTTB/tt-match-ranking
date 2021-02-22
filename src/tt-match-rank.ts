@@ -78,25 +78,42 @@ function getPointChanges(
   const pointChanges: { id: number; points: number }[] = [];
   rankedSets.forEach((matchSet) => {
     const winner = getSetWinner(matchSet.set, setRules);
-    if (winner == "home") {
-      pointChanges.push({
-        id: matchSet.homePlayerId,
-        points: matchRules.victoryPoints,
-      });
-      pointChanges.push({
-        id: matchSet.awayPlayerId,
-        points: matchRules.defeatPoints,
-      });
-    }
-    if (winner == "away") {
-      pointChanges.push({
-        id: matchSet.awayPlayerId,
-        points: matchRules.victoryPoints,
-      });
-      pointChanges.push({
-        id: matchSet.homePlayerId,
-        points: matchRules.defeatPoints,
-      });
+    if (matchSet.set.walkover) {
+      // In a walkover only the victor gets points
+      if (matchSet.set.walkover === "home") {
+        pointChanges.push({
+          id: matchSet.homePlayerId,
+          points: matchRules.victoryPoints,
+        });
+      }
+
+      if (matchSet.set.walkover === "away") {
+        pointChanges.push({
+          id: matchSet.awayPlayerId,
+          points: matchRules.victoryPoints,
+        });
+      }
+    }else{
+      if (winner == "home") {
+        pointChanges.push({
+          id: matchSet.homePlayerId,
+          points: matchRules.victoryPoints,
+        });
+        pointChanges.push({
+          id: matchSet.awayPlayerId,
+          points: matchRules.defeatPoints,
+        });
+      }
+      if (winner == "away") {
+        pointChanges.push({
+          id: matchSet.awayPlayerId,
+          points: matchRules.victoryPoints,
+        });
+        pointChanges.push({
+          id: matchSet.homePlayerId,
+          points: matchRules.defeatPoints,
+        });
+      }
     }
   });
 
