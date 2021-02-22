@@ -10,6 +10,7 @@ export interface TTPlayerRank<T> {
   id: number;
   player: T;
   points: number;
+  sameRankPoints: number;
 }
 
 export function generateMatchRank<T>(
@@ -18,19 +19,20 @@ export function generateMatchRank<T>(
   setRules: TTSetRules
 ): TTMatchRank<T> {
   const { unrankedPlayers, rankedPlayers } = splitRankedAndUnranked<T>(match);
-  const ranked = rankedPlayers.map(
+  const playerRanks = rankedPlayers.map(
     (x): TTPlayerRank<T> => {
       return {
         id: x.id,
         player: x.player,
         points: 0,
+        sameRankPoints: 0,
       };
     }
   );
 
   const rankedSets = getRankedSets<T>(match, unrankedPlayers);
   const pointChanges = getPointChanges(rankedSets, matchRules, setRules);
-  ranked.forEach((r) => {
+  playerRanks.forEach((r) => {
     pointChanges
       .filter((x) => x.id === r.id)
       .forEach((change) => {
@@ -38,8 +40,55 @@ export function generateMatchRank<T>(
       });
   });
 
-  ranked.sort((a, b) => b.points - a.points);
+  const sameRankGroup = playerRanks
+    .reduce((pv: { points: number; ids: number[] }[], cv) => {
+      const foundGroup = pv.find((x) => x.points == cv.points);
+      if (foundGroup) {
+        foundGroup.ids.push(cv.id);
+        return pv;
+      } else {
+        const newGroup = { points: cv.points, ids: [cv.id] };
+        return [newGroup, ...pv];
+      }
+    }, [])
+    .sort((a, b) => b.points - a.points);
+
+  const ranked: TTPlayerRank<T>[] = [];
+
+  sameRankGroup.forEach((subGroup) => {
+    const sameRankPlayers: TTPlayerRank<T>[] = subGroup.ids.map(
+      (x) => playerRanks.find((y) => y.id == x) as TTPlayerRank<T>
+    );
+    const sameRankedSets = getSetsOf<T>(match, subGroup.ids);
+
+    const samePointChanges = getPointChanges(
+      sameRankedSets,
+      matchRules,
+      setRules
+    );
+    sameRankPlayers.forEach((r) => {
+      samePointChanges
+        .filter((x) => x.id === r.id)
+        .forEach((change) => {
+          r.sameRankPoints += change.points;
+        });
+    });
+
+    sameRankPlayers.sort((a, b) => b.sameRankPoints - a.sameRankPoints);
+
+    ranked.push(...sameRankPlayers);
+  });
+
   return { ranked };
+}
+function getSetsOf<T>(match: TTMatch<T>, playerIds: number[]): TTMatchSet[] {
+  return match
+    .getSets()
+    .filter(
+      (ms) =>
+        playerIds.includes(ms.awayPlayerId) &&
+        playerIds.includes(ms.homePlayerId)
+    );
 }
 
 function getRankedSets<T>(
@@ -93,7 +142,7 @@ function getPointChanges(
           points: matchRules.victoryPoints,
         });
       }
-    }else{
+    } else {
       if (winner == "home") {
         pointChanges.push({
           id: matchSet.homePlayerId,
