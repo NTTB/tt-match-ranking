@@ -8,6 +8,10 @@ export function groupBy<TSrc, TKey, TVal = TSrc>(
   keySelector: (v: TSrc) => TKey,
   valueSelector: (v: TSrc) => TVal
 ): GroupBy<TKey, TVal>[] {
+  if (typeof src === "undefined" || src === null) {
+    throw new Error("src must be an array");
+  }
+
   return src.reduce((pv: GroupBy<TKey, TVal>[], cv) => {
     const objKey = keySelector(cv);
     const objVal = valueSelector(cv);
@@ -17,7 +21,7 @@ export function groupBy<TSrc, TKey, TVal = TSrc>(
       return pv;
     } else {
       const newGroup: GroupBy<TKey, TVal> = { key: objKey, values: [objVal] };
-      return [newGroup, ...pv];
+      return [...pv, newGroup];
     }
   }, []);
 }
