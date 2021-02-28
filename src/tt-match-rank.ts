@@ -18,11 +18,27 @@ export interface TTPlayerRank<T> {
   sameRankScoreRatio: TTRatio;
 }
 
+
+interface PointChange {
+  id: number;
+  points: number;
+  gameRatio: TTRatio;
+  scoreRatio: TTRatio;
+}
+
+
+interface MatchRankStep<T> {
+  set: "between" | "every";
+  applyChange: (rank: TTPlayerRank<T>, mod: PointChange) => void;
+  groupAndSortBy: (k: TTPlayerRank<T>) => number;
+}
+
 export function generateMatchRank<T>(
   match: TTMatch<T>,
   matchRules: TTMatchRules,
   setRules: TTSetRules
 ): TTMatchRank<T> {
+
   const { rankedPlayers } = splitRankedAndUnranked<T>(match);
   const playerRanks = rankedPlayers.map(
     (x): TTPlayerRank<T> => {
@@ -32,136 +48,109 @@ export function generateMatchRank<T>(
         points: 0,
         sameRankPoints: 0,
         sameRankGameRatio: TTRatio.Zero,
-        sameRankScoreRatio: TTRatio.Zero
+        sameRankScoreRatio: TTRatio.Zero,
       };
     }
   );
 
-  const rankedSets = getSetsOf<T>(match, rankedPlayers.map(x => x.id));
-  const pointChanges = getPointChanges(rankedSets, matchRules, setRules);
-  playerRanks.forEach((r) => {
-    pointChanges
-      .filter((x) => x.id === r.id)
-      .forEach((change) => {
-        r.points += change.points;
-      });
-  });
+  const steps: MatchRankStep<T>[] = [
+    // Step 1: Set
+    {
+      set: "between",
+      applyChange: (rank, mod) => rank.points += mod.points,
+      groupAndSortBy: (k) => k.points,
+    },
+    // Step 2: Set (between themselves)
+    {
+      set: "between",
+      applyChange: (rank, mod) => rank.sameRankPoints += mod.points,
+      groupAndSortBy: (k) => k.sameRankPoints,
+    },
+    //  Step 3: Game W/L ratio (between themselves)
+    {
+      set: "between",
+      applyChange: (rank, mod) => rank.sameRankGameRatio = TTRatio.sum(rank.sameRankGameRatio, mod.gameRatio),
+      groupAndSortBy: (k) => k.sameRankGameRatio.ratio,
+    },
+    //  Step 4: Score W/L Ratio (between themselves)
+    {
+      set: "between",
+      applyChange: (rank, mod) => rank.sameRankScoreRatio = TTRatio.sum(rank.sameRankScoreRatio, mod.scoreRatio),
+      groupAndSortBy: (k) => k.sameRankScoreRatio.ratio,
+    },
+  ];
 
-  const sameRankGroup = groupBy(
+  const result: TTMatchRank<T> = {
+    ranked: []
+  };
+
+  generateMatchRankStep<T>(
+    result,
     playerRanks,
-    (x) => x.points,
-    (x) => x.id
-  ).sort((a, b) => b.key - a.key);
+    match,
+    matchRules,
+    setRules,
+    steps,
+    0
+  );
 
-  const ranked: TTPlayerRank<T>[] = [];
-
-  sameRankGroup.forEach((subGroup) => {
-    const sameRankPlayers: TTPlayerRank<T>[] = subGroup.values.map(
-      (x) => playerRanks.find((y) => y.id == x) as TTPlayerRank<T>
-    );
-    const sameRankedSets = getSetsOf<T>(match, subGroup.values);
-
-    const samePointChanges = getPointChanges(
-      sameRankedSets,
-      matchRules,
-      setRules
-    );
-
-    sameRankPlayers.forEach((r) => {
-      samePointChanges
-        .filter((x) => x.id === r.id)
-        .forEach((change) => {
-          r.sameRankPoints += change.points;
-        });
-    });
-
-    sameRankPlayers.sort((a, b) => b.sameRankPoints - a.sameRankPoints);
-    const sameSubRankPlayers = groupBy(
-      sameRankPlayers,
-      (x) => x.sameRankPoints,
-      (x) => x
-    ).sort((a, b) => b.key - a.key);
-
-    sameSubRankPlayers.forEach((subsubGroup) => {
-      if (subsubGroup.values.length <= 1) {
-        ranked.push(...subsubGroup.values);
-        return;
-      }
-
-      const sameSubRankedSets = getSetsOf<T>(
-        match,
-        subsubGroup.values.map((x) => x.id)
-      );
-
-      const sameSubPointChanges = getPointChanges(
-        sameSubRankedSets,
-        matchRules,
-        setRules
-      );
-
-      subsubGroup.values.forEach((r) => {
-        sameSubPointChanges
-          .filter((x) => x.id === r.id)
-          .forEach((change) => {
-            r.sameRankGameRatio = TTRatio.sum(r.sameRankGameRatio, change.gameRatio);
-          });
-      });
-
-      const sortedByGameVictoryRatio = subsubGroup.values.sort((a, b) => {
-        return b.sameRankGameRatio.ratio - a.sameRankGameRatio.ratio;
-      });
-
-      const sameGameVictoriesQ = groupBy(sortedByGameVictoryRatio,
-        x => x.sameRankGameRatio.ratio,
-        x => x);
-
-      sameGameVictoriesQ.forEach((sameGameVicotriesQGroup) => {
-        if (sameGameVicotriesQGroup.values.length <= 1) {
-          ranked.push(...sameGameVicotriesQGroup.values);
-          return;
-        }
-
-        const sameGameVictoryQSet = getSetsOf<T>(
-          match,
-          sameGameVicotriesQGroup.values.map((x) => x.id)
-        );
-
-        const sameSubVictoryQChanges = getPointChanges(
-          sameGameVictoryQSet,
-          matchRules,
-          setRules
-        );
-
-        sameGameVicotriesQGroup.values.forEach((r) => {
-          sameSubVictoryQChanges
-            .filter((x) => x.id === r.id)
-            .forEach((change) => {
-              r.sameRankScoreRatio = TTRatio.sum(r.sameRankScoreRatio, change.scoreRatio);
-            });
-        });
-
-        const sortedByGamePointsRatio = sameGameVicotriesQGroup.values.sort((a, b) => {
-          return b.sameRankScoreRatio.ratio - a.sameRankScoreRatio.ratio;
-        });
-
-        sortedByGamePointsRatio.forEach((element) => {
-          ranked.push(element);
-        });
-      });
-    });
-  });
-
-  return { ranked };
+  return result;
 }
 
-function getSetsOf<T>(match: TTMatch<T>, playerIds: number[]): TTMatchSet[] {
-  return match
-    .getSets()
-    .filter(
-      (ms) =>
-        playerIds.includes(ms.awayPlayerId) &&
-        playerIds.includes(ms.homePlayerId)
-    );
+function generateMatchRankStep<T>(
+  result: TTMatchRank<T>,
+  remaining: TTPlayerRank<T>[],
+  match: TTMatch<T>,
+  matchRules: TTMatchRules,
+  setRules: TTSetRules,
+  steps: MatchRankStep<T>[],
+  stepIndex: number) {
+  if (remaining.length <= 1) {
+    result.ranked.push(...remaining);
+    return;
+  }
+
+  if (stepIndex < 0) throw new Error("stepIndex must be 0 or bigger");
+  if (stepIndex >= steps.length) {
+    result.ranked.push(...remaining);
+    return;
+  }
+
+  const step = steps[stepIndex];
+  const sets = filterSets(match.getSets(), step.set, remaining.map(x => x.id));
+
+  const pointChanges = getPointChanges(
+    sets,
+    matchRules,
+    setRules
+  );
+
+  remaining.forEach((rank) => {
+    pointChanges
+      .filter((x) => x.id === rank.id)
+      .forEach((mod) => step.applyChange(rank, mod));
+  });
+
+  remaining.sort((a, b) => step.groupAndSortBy(b) - step.groupAndSortBy(a));
+
+  const grouped = groupBy(remaining,
+    x => step.groupAndSortBy(x),
+    x => x);
+
+  grouped.forEach(group => {
+    generateMatchRankStep(result, group.values, match, matchRules, setRules, steps, stepIndex + 1);
+  });
+}
+
+function filterSets(sets: TTMatchSet[], filter: "between" | "every", playerIds: number[]): TTMatchSet[] {
+  return sets
+    .filter((ms) => {
+      if (filter === "between") {
+        return playerIds.includes(ms.awayPlayerId) && playerIds.includes(ms.homePlayerId);
+      } else {
+        return playerIds.includes(ms.awayPlayerId) || playerIds.includes(ms.homePlayerId);
+      }
+    });
 }
 
 function splitRankedAndUnranked<T>(match: TTMatch<T>) {
@@ -176,13 +165,6 @@ function splitRankedAndUnranked<T>(match: TTMatch<T>) {
     .getPlayers()
     .filter((p) => !rankedPlayers.some((rp) => rp.id === p.id));
   return { unrankedPlayers, rankedPlayers };
-}
-
-interface PointChange {
-  id: number;
-  points: number;
-  gameRatio: TTRatio;
-  scoreRatio: TTRatio;
 }
 
 function getPointChanges(
