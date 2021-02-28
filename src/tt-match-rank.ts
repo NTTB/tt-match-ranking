@@ -16,6 +16,7 @@ export interface TTPlayerRank<T> {
   sameRankPoints: number;
   sameRankGameRatio: TTRatio;
   sameRankScoreRatio: TTRatio;
+  sameRankGameRatioEvery: TTRatio;
 }
 
 
@@ -49,6 +50,7 @@ export function generateMatchRank<T>(
         sameRankPoints: 0,
         sameRankGameRatio: TTRatio.Zero,
         sameRankScoreRatio: TTRatio.Zero,
+        sameRankGameRatioEvery: TTRatio.Zero,
       };
     }
   );
@@ -77,6 +79,12 @@ export function generateMatchRank<T>(
       set: "between",
       applyChange: (rank, mod) => rank.sameRankScoreRatio = TTRatio.sum(rank.sameRankScoreRatio, mod.scoreRatio),
       groupAndSortBy: (k) => k.sameRankScoreRatio.ratio,
+    },
+    //  Step 5: Game W/L ratio (including other sets)
+    {
+      set: "every",
+      applyChange: (rank, mod) => rank.sameRankGameRatioEvery = TTRatio.sum(rank.sameRankGameRatioEvery, mod.gameRatio),
+      groupAndSortBy: (k) => k.sameRankGameRatioEvery.ratio,
     },
   ];
 
