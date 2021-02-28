@@ -24,7 +24,7 @@ export function generateMatchRank<T>(
   matchRules: TTMatchRules,
   setRules: TTSetRules
 ): TTMatchRank<T> {
-  const { unrankedPlayers, rankedPlayers } = splitRankedAndUnranked<T>(match);
+  const { rankedPlayers } = splitRankedAndUnranked<T>(match);
   const playerRanks = rankedPlayers.map(
     (x): TTPlayerRank<T> => {
       return {
@@ -40,7 +40,7 @@ export function generateMatchRank<T>(
     }
   );
 
-  const rankedSets = getRankedSets<T>(match, unrankedPlayers);
+  const rankedSets = getSetsOf<T>(match, rankedPlayers.map(x => x.id));
   const pointChanges = getPointChanges(rankedSets, matchRules, setRules);
   playerRanks.forEach((r) => {
     pointChanges
@@ -193,20 +193,6 @@ function getSetsOf<T>(match: TTMatch<T>, playerIds: number[]): TTMatchSet[] {
       (ms) =>
         playerIds.includes(ms.awayPlayerId) &&
         playerIds.includes(ms.homePlayerId)
-    );
-}
-
-function getRankedSets<T>(
-  match: TTMatch<T>,
-  unrankedPlayers: { id: number; player: T }[]
-) {
-  return match
-    .getSets()
-    .filter(
-      (s) =>
-        !unrankedPlayers.some(
-          (p) => p.id === s.awayPlayerId || p.id === s.homePlayerId
-        )
     );
 }
 
