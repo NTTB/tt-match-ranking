@@ -15,6 +15,8 @@ export interface TTPlayerRank<T> {
   sameRankPoints: number;
   sameRankGameVictories: number;
   sameRankGameDefeats: number;
+  sameRankGamePointsWon: number;
+  sameRankGamePointsLost: number;
 }
 
 export function generateMatchRank<T>(
@@ -32,6 +34,8 @@ export function generateMatchRank<T>(
         sameRankPoints: 0,
         sameRankGameVictories: 0,
         sameRankGameDefeats: 0,
+        sameRankGamePointsWon: 0,
+        sameRankGamePointsLost: 0,
       };
     }
   );
@@ -107,7 +111,7 @@ export function generateMatchRank<T>(
           });
       });
 
-      const sortedByPoints = subsubGroup.values.sort((a, b) => {
+      const sortedByGameVictoryRatio = subsubGroup.values.sort((a, b) => {
         if (
           a.sameRankGameDefeats === 0 &&
           a.sameRankGameVictories === 0 &&
@@ -117,17 +121,64 @@ export function generateMatchRank<T>(
           return 0;
         }
         if (a.sameRankGameDefeats === 0 && b.sameRankGameDefeats === 0) {
-          throw new Error(
-            "Equal ranked players without a defeat can't be sorted"
-          );
+          return 0; // Same ranked players without defeats can't be sorted
         }
         const aq = a.sameRankGameVictories / a.sameRankGameDefeats;
         const bq = b.sameRankGameVictories / b.sameRankGameDefeats;
         return bq - aq;
       });
 
-      sortedByPoints.forEach((element) => {
-        ranked.push(element);
+      const sameGameVictoriesQ = groupBy(sortedByGameVictoryRatio,
+        x => x.sameRankGameVictories / x.sameRankGameDefeats,
+        x => x);
+
+      sameGameVictoriesQ.forEach((sameGameVicotriesQGroup) => {
+        if (sameGameVicotriesQGroup.values.length <= 1) {
+          ranked.push(...sameGameVicotriesQGroup.values);
+          return;
+        }
+
+        const sameGameVictoryQSet = getSetsOf<T>(
+          match,
+          sameGameVicotriesQGroup.values.map((x) => x.id)
+        );
+
+        const sameSubVictoryQChanges = getPointChanges(
+          sameGameVictoryQSet,
+          matchRules,
+          setRules
+        );
+
+        sameGameVicotriesQGroup.values.forEach((r) => {
+          sameSubVictoryQChanges
+            .filter((x) => x.id === r.id)
+            .forEach((change) => {
+              r.sameRankGamePointsWon += change.gamePointsWon;
+              r.sameRankGamePointsLost += change.gamePointsLost;
+            });
+        });
+
+        const sortedByGamePointsRatio = sameGameVicotriesQGroup.values.sort((a, b) => {
+          if (
+            a.sameRankGamePointsWon === 0 &&
+            a.sameRankGamePointsLost === 0 &&
+            b.sameRankGamePointsWon === 0 &&
+            b.sameRankGamePointsLost === 0
+          ) {
+            return 0;
+          }
+          if (a.sameRankGamePointsLost === 0 && b.sameRankGamePointsLost === 0) {
+            // Happens when no games have been played and/or both players have yet to meet.
+            return 0;
+          }
+          const aq = a.sameRankGamePointsWon / a.sameRankGamePointsLost;
+          const bq = b.sameRankGamePointsWon / b.sameRankGamePointsLost;
+          return bq - aq;
+        });
+
+        sortedByGamePointsRatio.forEach((element) => {
+          ranked.push(element);
+        });
       });
     });
   });
@@ -178,6 +229,8 @@ interface PointChange {
   points: number;
   gameVictories: number;
   gameDefeats: number;
+  gamePointsWon: number;
+  gamePointsLost: number;
 }
 
 function getPointChanges(
@@ -195,7 +248,9 @@ function getPointChanges(
           id: matchSet.homePlayerId,
           points: matchRules.victoryPoints,
           gameVictories: 0, // Doesn't apply
-          gameDefeats: 0, // Doesn't apply
+          gameDefeats: 0,   // Doesn't apply
+          gamePointsWon: 0, // Doesn't apply
+          gamePointsLost: 0,// Doesn't apply
         });
       }
 
@@ -204,7 +259,9 @@ function getPointChanges(
           id: matchSet.awayPlayerId,
           points: matchRules.victoryPoints,
           gameVictories: 0, // Doesn't apply
-          gameDefeats: 0, // Doesn't apply
+          gameDefeats: 0,   // Doesn't apply
+          gamePointsWon: 0, // Doesn't apply
+          gamePointsLost: 0,// Doesn't apply
         });
       }
     } else {
@@ -218,6 +275,8 @@ function getPointChanges(
           gameDefeats: matchSet.set.games.filter(
             (x) => getGameWinner(x, setRules.gameRules) === "away"
           ).length,
+          gamePointsWon: matchSet.set.games.reduce((pv, cv) => pv + cv.homeScore, 0),
+          gamePointsLost: matchSet.set.games.reduce((pv, cv) => pv + cv.awayScore, 0),
         });
         pointChanges.push({
           id: matchSet.awayPlayerId,
@@ -228,6 +287,8 @@ function getPointChanges(
           gameDefeats: matchSet.set.games.filter(
             (x) => getGameWinner(x, setRules.gameRules) === "home"
           ).length,
+          gamePointsWon: matchSet.set.games.reduce((pv, cv) => pv + cv.awayScore, 0),
+          gamePointsLost: matchSet.set.games.reduce((pv, cv) => pv + cv.homeScore, 0),
         });
       }
       if (winner == "away") {
@@ -240,6 +301,8 @@ function getPointChanges(
           gameDefeats: matchSet.set.games.filter(
             (x) => getGameWinner(x, setRules.gameRules) === "home"
           ).length,
+          gamePointsWon: matchSet.set.games.reduce((pv, cv) => pv + cv.awayScore, 0),
+          gamePointsLost: matchSet.set.games.reduce((pv, cv) => pv + cv.homeScore, 0),
         });
         pointChanges.push({
           id: matchSet.homePlayerId,
@@ -250,6 +313,8 @@ function getPointChanges(
           gameDefeats: matchSet.set.games.filter(
             (x) => getGameWinner(x, setRules.gameRules) === "away"
           ).length,
+          gamePointsWon: matchSet.set.games.reduce((pv, cv) => pv + cv.homeScore, 0),
+          gamePointsLost: matchSet.set.games.reduce((pv, cv) => pv + cv.awayScore, 0),
         });
       }
     }
