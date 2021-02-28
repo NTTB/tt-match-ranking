@@ -111,12 +111,12 @@ describe("Scenario 4", () => {
     ({ player, sameRankGameVictories, sameRankGameDefeats }) => {
       test(`${player} has ${sameRankGameVictories} same rank victories`, () => {
         const rank = ranking.ranked.find((x) => x.player === player);
-        expect(rank?.sameRankGameVictories).toBe(sameRankGameVictories);
+        expect(rank?.sameRankGameRatio.won).toBe(sameRankGameVictories);
       });
 
       test(`${player} has ${sameRankGameDefeats} same rank defeats`, () => {
         const rank = ranking.ranked.find((x) => x.player === player);
-        expect(rank?.sameRankGameDefeats).toBe(sameRankGameDefeats);
+        expect(rank?.sameRankGameRatio.lost).toBe(sameRankGameDefeats);
       });
     }
   );
@@ -134,12 +134,12 @@ describe("Scenario 4", () => {
     ({ player, sameRankGamePointsWon, sameRankGamePointsLost }) => {
       test(`${player} has ${sameRankGamePointsWon} same rank points won`, () => {
         const rank = ranking.ranked.find((x) => x.player === player);
-        expect(rank?.sameRankGamePointsWon).toBe(sameRankGamePointsWon);
+        expect(rank?.sameRankScoreRatio.won).toBe(sameRankGamePointsWon);
       });
 
       test(`${player} has ${sameRankGamePointsLost} same rank points lost`, () => {
         const rank = ranking.ranked.find((x) => x.player === player);
-        expect(rank?.sameRankGamePointsLost).toBe(sameRankGamePointsLost);
+        expect(rank?.sameRankScoreRatio.lost).toBe(sameRankGamePointsLost);
       });
     }
   );

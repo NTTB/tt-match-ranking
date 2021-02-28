@@ -3,6 +3,7 @@ import { getSetWinner } from "./tt-set";
 import { TTMatch, TTMatchSet } from "./tt-match";
 import { groupBy } from "./helpers";
 import { getGameWinner } from "./tt-game";
+import { TTRatio } from "./tt-ratio";
 
 export interface TTMatchRank<T> {
   ranked: TTPlayerRank<T>[];
@@ -13,10 +14,8 @@ export interface TTPlayerRank<T> {
   player: T;
   points: number;
   sameRankPoints: number;
-  sameRankGameVictories: number;
-  sameRankGameDefeats: number;
-  sameRankGamePointsWon: number;
-  sameRankGamePointsLost: number;
+  sameRankGameRatio: TTRatio;
+  sameRankScoreRatio: TTRatio;
 }
 
 export function generateMatchRank<T>(
@@ -32,10 +31,8 @@ export function generateMatchRank<T>(
         player: x.player,
         points: 0,
         sameRankPoints: 0,
-        sameRankGameVictories: 0,
-        sameRankGameDefeats: 0,
-        sameRankGamePointsWon: 0,
-        sameRankGamePointsLost: 0,
+        sameRankGameRatio: TTRatio.Zero,
+        sameRankScoreRatio: TTRatio.Zero
       };
     }
   );
@@ -106,30 +103,16 @@ export function generateMatchRank<T>(
         sameSubPointChanges
           .filter((x) => x.id === r.id)
           .forEach((change) => {
-            r.sameRankGameVictories += change.gameVictories;
-            r.sameRankGameDefeats += change.gameDefeats;
+            r.sameRankGameRatio = TTRatio.sum(r.sameRankGameRatio, change.gameRatio);
           });
       });
 
       const sortedByGameVictoryRatio = subsubGroup.values.sort((a, b) => {
-        if (
-          a.sameRankGameDefeats === 0 &&
-          a.sameRankGameVictories === 0 &&
-          b.sameRankGameDefeats === 0 &&
-          b.sameRankGameVictories === 0
-        ) {
-          return 0;
-        }
-        if (a.sameRankGameDefeats === 0 && b.sameRankGameDefeats === 0) {
-          return 0; // Same ranked players without defeats can't be sorted
-        }
-        const aq = a.sameRankGameVictories / a.sameRankGameDefeats;
-        const bq = b.sameRankGameVictories / b.sameRankGameDefeats;
-        return bq - aq;
+        return b.sameRankGameRatio.ratio - a.sameRankGameRatio.ratio;
       });
 
       const sameGameVictoriesQ = groupBy(sortedByGameVictoryRatio,
-        x => x.sameRankGameVictories / x.sameRankGameDefeats,
+        x => x.sameRankGameRatio.ratio,
         x => x);
 
       sameGameVictoriesQ.forEach((sameGameVicotriesQGroup) => {
@@ -153,27 +136,12 @@ export function generateMatchRank<T>(
           sameSubVictoryQChanges
             .filter((x) => x.id === r.id)
             .forEach((change) => {
-              r.sameRankGamePointsWon += change.gamePointsWon;
-              r.sameRankGamePointsLost += change.gamePointsLost;
+              r.sameRankScoreRatio = TTRatio.sum(r.sameRankScoreRatio, change.scoreRatio);
             });
         });
 
         const sortedByGamePointsRatio = sameGameVicotriesQGroup.values.sort((a, b) => {
-          if (
-            a.sameRankGamePointsWon === 0 &&
-            a.sameRankGamePointsLost === 0 &&
-            b.sameRankGamePointsWon === 0 &&
-            b.sameRankGamePointsLost === 0
-          ) {
-            return 0;
-          }
-          if (a.sameRankGamePointsLost === 0 && b.sameRankGamePointsLost === 0) {
-            // Happens when no games have been played and/or both players have yet to meet.
-            return 0;
-          }
-          const aq = a.sameRankGamePointsWon / a.sameRankGamePointsLost;
-          const bq = b.sameRankGamePointsWon / b.sameRankGamePointsLost;
-          return bq - aq;
+          return b.sameRankScoreRatio.ratio - a.sameRankScoreRatio.ratio;
         });
 
         sortedByGamePointsRatio.forEach((element) => {
@@ -213,10 +181,8 @@ function splitRankedAndUnranked<T>(match: TTMatch<T>) {
 interface PointChange {
   id: number;
   points: number;
-  gameVictories: number;
-  gameDefeats: number;
-  gamePointsWon: number;
-  gamePointsLost: number;
+  gameRatio: TTRatio;
+  scoreRatio: TTRatio;
 }
 
 function getPointChanges(
@@ -226,6 +192,9 @@ function getPointChanges(
 ): PointChange[] {
   const pointChanges: PointChange[] = [];
   rankedSets.forEach((matchSet) => {
+    const games = matchSet.set.games;
+    const gamesWonByHome = games.filter((x) => getGameWinner(x, setRules.gameRules) === "home").length
+    const gamesWonByAway = games.filter((x) => getGameWinner(x, setRules.gameRules) === "away").length
     const winner = getSetWinner(matchSet.set, setRules);
     if (matchSet.set.walkover) {
       // In a walkover only the victor gets points
@@ -233,10 +202,8 @@ function getPointChanges(
         pointChanges.push({
           id: matchSet.homePlayerId,
           points: matchRules.victoryPoints,
-          gameVictories: 0, // Doesn't apply
-          gameDefeats: 0,   // Doesn't apply
-          gamePointsWon: 0, // Doesn't apply
-          gamePointsLost: 0,// Doesn't apply
+          gameRatio: TTRatio.Zero,
+          scoreRatio: TTRatio.Zero,
         });
       }
 
@@ -244,10 +211,8 @@ function getPointChanges(
         pointChanges.push({
           id: matchSet.awayPlayerId,
           points: matchRules.victoryPoints,
-          gameVictories: 0, // Doesn't apply
-          gameDefeats: 0,   // Doesn't apply
-          gamePointsWon: 0, // Doesn't apply
-          gamePointsLost: 0,// Doesn't apply
+          gameRatio: TTRatio.Zero,
+          scoreRatio: TTRatio.Zero,
         });
       }
     } else {
@@ -255,52 +220,40 @@ function getPointChanges(
         pointChanges.push({
           id: matchSet.homePlayerId,
           points: matchRules.victoryPoints,
-          gameVictories: matchSet.set.games.filter(
-            (x) => getGameWinner(x, setRules.gameRules) === "home"
-          ).length,
-          gameDefeats: matchSet.set.games.filter(
-            (x) => getGameWinner(x, setRules.gameRules) === "away"
-          ).length,
-          gamePointsWon: matchSet.set.games.reduce((pv, cv) => pv + cv.homeScore, 0),
-          gamePointsLost: matchSet.set.games.reduce((pv, cv) => pv + cv.awayScore, 0),
+          gameRatio: new TTRatio(gamesWonByHome, gamesWonByAway),
+          scoreRatio: new TTRatio(
+            games.reduce((pv, cv) => pv + cv.homeScore, 0),
+            games.reduce((pv, cv) => pv + cv.awayScore, 0)
+          ),
         });
         pointChanges.push({
           id: matchSet.awayPlayerId,
           points: matchRules.defeatPoints,
-          gameVictories: matchSet.set.games.filter(
-            (x) => getGameWinner(x, setRules.gameRules) === "away"
-          ).length,
-          gameDefeats: matchSet.set.games.filter(
-            (x) => getGameWinner(x, setRules.gameRules) === "home"
-          ).length,
-          gamePointsWon: matchSet.set.games.reduce((pv, cv) => pv + cv.awayScore, 0),
-          gamePointsLost: matchSet.set.games.reduce((pv, cv) => pv + cv.homeScore, 0),
+          gameRatio: new TTRatio(gamesWonByAway, gamesWonByHome),
+          scoreRatio: new TTRatio(
+            games.reduce((pv, cv) => pv + cv.awayScore, 0),
+            games.reduce((pv, cv) => pv + cv.homeScore, 0)
+          ),
         });
       }
       if (winner == "away") {
         pointChanges.push({
           id: matchSet.awayPlayerId,
           points: matchRules.victoryPoints,
-          gameVictories: matchSet.set.games.filter(
-            (x) => getGameWinner(x, setRules.gameRules) === "away"
-          ).length,
-          gameDefeats: matchSet.set.games.filter(
-            (x) => getGameWinner(x, setRules.gameRules) === "home"
-          ).length,
-          gamePointsWon: matchSet.set.games.reduce((pv, cv) => pv + cv.awayScore, 0),
-          gamePointsLost: matchSet.set.games.reduce((pv, cv) => pv + cv.homeScore, 0),
+          gameRatio: new TTRatio(gamesWonByAway, gamesWonByHome),
+          scoreRatio: new TTRatio(
+            games.reduce((pv, cv) => pv + cv.awayScore, 0),
+            games.reduce((pv, cv) => pv + cv.homeScore, 0)
+          ),
         });
         pointChanges.push({
           id: matchSet.homePlayerId,
           points: matchRules.defeatPoints,
-          gameVictories: matchSet.set.games.filter(
-            (x) => getGameWinner(x, setRules.gameRules) === "home"
-          ).length,
-          gameDefeats: matchSet.set.games.filter(
-            (x) => getGameWinner(x, setRules.gameRules) === "away"
-          ).length,
-          gamePointsWon: matchSet.set.games.reduce((pv, cv) => pv + cv.homeScore, 0),
-          gamePointsLost: matchSet.set.games.reduce((pv, cv) => pv + cv.awayScore, 0),
+          gameRatio: new TTRatio(gamesWonByHome, gamesWonByAway),
+          scoreRatio: new TTRatio(
+            games.reduce((pv, cv) => pv + cv.homeScore, 0),
+            games.reduce((pv, cv) => pv + cv.awayScore, 0)
+          )
         });
       }
     }

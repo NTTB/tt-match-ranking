@@ -108,12 +108,12 @@ describe("Scenario 3", () => {
     ({ player, sameRankGameVictories, sameRankGameDefeats }) => {
       test(`${player} has ${sameRankGameVictories} same rank victories`, () => {
         const rank = ranking.ranked.find((x) => x.player === player);
-        expect(rank?.sameRankGameVictories).toBe(sameRankGameVictories);
+        expect(rank?.sameRankGameRatio.won).toBe(sameRankGameVictories);
       });
 
       test(`${player} has ${sameRankGameDefeats} same rank defeats`, () => {
         const rank = ranking.ranked.find((x) => x.player === player);
-        expect(rank?.sameRankGameDefeats).toBe(sameRankGameDefeats);
+        expect(rank?.sameRankGameRatio.lost).toBe(sameRankGameDefeats);
       });
     }
   );
