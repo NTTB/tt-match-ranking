@@ -141,7 +141,7 @@ function generateMatchRankStep<T>(
   setRules: TTSetRules,
   steps: MatchRankStep<T>[],
   stepIndex: number,
-  resetIndex: number = 0
+  resetIndex = 0
 ) {
   if (remaining.length === 0) {
     return;
