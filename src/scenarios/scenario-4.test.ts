@@ -4,7 +4,7 @@ import { getSetWinner, parseSetScore } from "../tt-set";
 
 // Please note that player C and F have been swapped in the order they were added to the match.
 // This is because otherwise the stable stable sort determines the order.
-// It however has no effect on the input. 
+// It however has no effect on the input.
 describe("Scenario 4", () => {
   let match: TTMatch<string>;
   let ranking: TTMatchRank<string>;
@@ -122,14 +122,14 @@ describe("Scenario 4", () => {
   );
 
   describe.each`
-  player | sameRankGamePointsWon | sameRankGamePointsLost
-  ${"A"} | ${0}                  | ${0}
-  ${"B"} | ${0}                  | ${0}
-  ${"C"} | ${94}                  | ${90}
-  ${"D"} | ${96}                  | ${92}
-  ${"E"} | ${0}                  | ${0}
-  ${"F"} | ${86}                  | ${94}
-`(
+    player | sameRankGamePointsWon | sameRankGamePointsLost
+    ${"A"} | ${0}                  | ${0}
+    ${"B"} | ${0}                  | ${0}
+    ${"C"} | ${94}                 | ${90}
+    ${"D"} | ${96}                 | ${92}
+    ${"E"} | ${0}                  | ${0}
+    ${"F"} | ${86}                 | ${94}
+  `(
     "Player $player has $sameRankGamePointsWon-$sameRankGamePointsLost sameRank game points won/lost",
     ({ player, sameRankGamePointsWon, sameRankGamePointsLost }) => {
       test(`${player} has ${sameRankGamePointsWon} same rank points won`, () => {

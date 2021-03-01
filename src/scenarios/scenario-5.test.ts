@@ -53,7 +53,6 @@ describe("Scenario 5", () => {
     });
   });
 
-
   test.each`
     player | rank
     ${"E"} | ${1}
@@ -84,7 +83,7 @@ describe("Scenario 5", () => {
     player | sameRankPoints
     ${"E"} | ${0}
     ${"C"} | ${1}
-    ${"F"} | ${1}
+    ${"F"} | ${0}
     ${"A"} | ${1}
     ${"D"} | ${1}
     ${"B"} | ${0}
@@ -120,14 +119,14 @@ describe("Scenario 5", () => {
   );
 
   describe.each`
-  player | sameRankGamePointsWon | sameRankGamePointsLost
-  ${"E"} | ${0}                  | ${0}
-  ${"C"} | ${71}                 | ${71}
-  ${"F"} | ${70}                 | ${70}
-  ${"A"} | ${77}                 | ${77}
-  ${"D"} | ${0}                  | ${0}
-  ${"B"} | ${0}                  | ${0}
-`(
+    player | sameRankGamePointsWon | sameRankGamePointsLost
+    ${"E"} | ${0}                  | ${0}
+    ${"C"} | ${71}                 | ${71}
+    ${"F"} | ${70}                 | ${70}
+    ${"A"} | ${77}                 | ${77}
+    ${"D"} | ${0}                  | ${0}
+    ${"B"} | ${0}                  | ${0}
+  `(
     "Player $player has $sameRankGamePointsWon-$sameRankGamePointsLost sameRank game points won/lost",
     ({ player, sameRankGamePointsWon, sameRankGamePointsLost }) => {
       test(`${player} has ${sameRankGamePointsWon} same rank points won`, () => {
@@ -143,14 +142,14 @@ describe("Scenario 5", () => {
   );
 
   describe.each`
-  player | sameRankGameVictoriesAll | sameRankGameDefeatsAll
-  ${"E"} | ${0}                     | ${0}
-  ${"C"} | ${10}                    | ${8}
-  ${"F"} | ${10}                    | ${8}
-  ${"A"} | ${10}                    | ${10}
-  ${"D"} | ${0}                     | ${0}
-  ${"B"} | ${0}                     | ${0}
-`(
+    player | sameRankGameVictoriesAll | sameRankGameDefeatsAll
+    ${"E"} | ${0}                     | ${0}
+    ${"C"} | ${10}                    | ${8}
+    ${"F"} | ${10}                    | ${8}
+    ${"A"} | ${10}                    | ${10}
+    ${"D"} | ${0}                     | ${0}
+    ${"B"} | ${0}                     | ${0}
+  `(
     "Player $player has $sameRankGameVictoriesAll-$sameRankGameDefeatsAll sameRank game points won/lost (ALL)",
     ({ player, sameRankGameVictoriesAll, sameRankGameDefeatsAll }) => {
       test(`${player} has ${sameRankGameVictoriesAll} same rank victories ALL`, () => {
