@@ -1,6 +1,6 @@
 {
   "name": "@nttb/tt-match-ranking",
-  "version": "0.9.0-beta.0",
+  "version": "0.9.0-beta.1",
   "description": "Table tennis match ranking library",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -9,6 +9,7 @@
   ],
   "scripts": {
     "build": "tsc",
+    "prepack": "npm run-script build",
     "lint": "eslint src",
     "lint:fix": "eslint --fix src",
     "format": "prettier --check src",
