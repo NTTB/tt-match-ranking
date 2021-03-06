@@ -4,6 +4,7 @@ export class TTRatio {
   get ratio(): number {
     return this.won / this.lost;
   }
+
   static get Zero(): TTRatio {
     return new TTRatio(0, 0);
   }
