@@ -1,5 +1,6 @@
-import { TTGame, getGameWinner, parseGameScore } from "./tt-game";
-import { TTGameRules } from "./rules";
+import { getGameWinner } from "../../helpers/get-game-winner";
+import { TTGameRules } from "../../rules";
+import { TTGame } from "../../tt-game";
 
 describe("getGameWinner(...)", () => {
   test.each`
@@ -25,34 +26,4 @@ describe("getGameWinner(...)", () => {
       expect(getGameWinner(game, rules)).toBe(expected);
     }
   );
-});
-
-describe("parseGameScore(`...`)", () => {
-  test.each([
-    undefined,
-    null,
-    "",
-    "a-a",
-    "-1-0",
-    "1.0",
-    "1 0",
-    "11-11a",
-    "00",
-    "99",
-  ])("Should throw when input is `%p`", (input) => {
-    const act = () => parseGameScore(input as string);
-    expect(act).toThrow(/Unable to parse game score from: /);
-  });
-
-  test.each`
-    home  | away  | input
-    ${0}  | ${0}  | ${"0-0"}
-    ${11} | ${0}  | ${"11-0"}
-    ${0}  | ${11} | ${"0-11"}
-    ${10} | ${12} | ${"10-12"}
-  `("It should parse $input as $home-$away", ({ home, away, input }) => {
-    const result = parseGameScore(input);
-    expect(result.homeScore).toBe(home);
-    expect(result.awayScore).toBe(away);
-  });
 });

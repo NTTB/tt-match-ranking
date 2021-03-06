@@ -1,6 +1,8 @@
-import { TTMatch } from "../tt-match";
-import { generateMatchRank, TTMatchRank } from "../tt-match-rank";
-import { getSetWinner, parseSetScore } from "../tt-set";
+import { getSetWinner } from "../../helpers";
+import { parseSetScore } from "../../parsers";
+import { TTMatchRules, TTSetRules } from "../../rules";
+import { TTMatch } from "../../tt-match";
+import { TTMatchRank, generateMatchRank } from "../../tt-match-rank";
 
 // Please note that player C and F have been swapped in the order they were added to the match.
 // This is because otherwise the stable stable sort determines the order.
@@ -8,6 +10,12 @@ import { getSetWinner, parseSetScore } from "../tt-set";
 describe("Scenario 4", () => {
   let match: TTMatch<string>;
   let ranking: TTMatchRank<string>;
+
+  const matchRules: TTMatchRules = { defeatPoints: 0, victoryPoints: 1 };
+  const setRules: TTSetRules = {
+    bestOf: 5,
+    gameRules: { scoreDistance: 2, scoreMinimum: 11 },
+  };
   beforeAll(() => {
     match = new TTMatch<string>();
     const p1 = match.addPlayer("A");
@@ -37,19 +45,12 @@ describe("Scenario 4", () => {
     match.addSet(p3, p5, parseSetScore("7-11,5-11,9-11"));
     match.addSet(p1, p2, parseSetScore("11-8,11-7,9-11,11-2"));
 
-    ranking = generateMatchRank(
-      match,
-      { defeatPoints: 0, victoryPoints: 1 },
-      { bestOf: 5, gameRules: { scoreDistance: 2, scoreMinimum: 11 } }
-    );
+    ranking = generateMatchRank(match, matchRules, setRules);
   });
 
   test("All sets have a winner", () => {
     match.getSets().forEach((set) => {
-      const winner = getSetWinner(set.set, {
-        bestOf: 5,
-        gameRules: { scoreDistance: 2, scoreMinimum: 11 },
-      });
+      const winner = getSetWinner(set.set, setRules);
       if (winner === undefined) {
         fail(`${set.homePlayerId}-${set.awayPlayerId} has no winner`);
       }

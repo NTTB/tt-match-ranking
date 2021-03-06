@@ -1,7 +1,7 @@
-import { TTGameRules, TTMatchRules, TTSetRules } from "../rules";
-import { TTMatch } from "../tt-match";
-import { generateMatchRank, TTMatchRank } from "../tt-match-rank";
-import { parseSetScore } from "../tt-set";
+import { parseSetScore } from "../../parsers";
+import { TTMatchRules, TTSetRules, TTGameRules } from "../../rules";
+import { TTMatch } from "../../tt-match";
+import { TTMatchRank, generateMatchRank } from "../../tt-match-rank";
 
 describe("Walkover scenarios", () => {
   let match: TTMatch<string>;

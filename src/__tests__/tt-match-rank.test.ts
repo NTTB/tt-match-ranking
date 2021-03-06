@@ -1,6 +1,6 @@
-import { TTMatch } from "./tt-match";
-import { generateMatchRank, TTMatchRank } from "./tt-match-rank";
-import { parseSetScore } from "./tt-set";
+import { parseSetScore } from "../parsers";
+import { TTMatch } from "../tt-match";
+import { generateMatchRank, TTMatchRank } from "../tt-match-rank";
 
 describe("generateMatchRank(...)", () => {
   let match: TTMatch<string>;

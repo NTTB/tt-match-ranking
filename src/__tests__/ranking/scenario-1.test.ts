@@ -1,8 +1,15 @@
-import { TTMatch } from "../tt-match";
-import { generateMatchRank, TTMatchRank } from "../tt-match-rank";
-import { getSetWinner, parseSetScore } from "../tt-set";
+import { getSetWinner } from "../../helpers";
+import { parseSetScore } from "../../parsers";
+import { TTMatch } from "../../tt-match";
+import { TTMatchRank, generateMatchRank } from "../../tt-match-rank";
 
 describe("Scenario 1", () => {
+  const matchRules = { defeatPoints: 0, victoryPoints: 1 };
+  const setRules = {
+    bestOf: 5,
+    gameRules: { scoreDistance: 2, scoreMinimum: 11 },
+  };
+
   let match: TTMatch<string>;
   let ranking: TTMatchRank<string>;
   beforeAll(() => {
@@ -34,19 +41,12 @@ describe("Scenario 1", () => {
     match.addSet(p3, p5, parseSetScore("11-8,11-8,11-7"));
     match.addSet(p1, p2, parseSetScore("8-11,7-11,11-9,12-10,11-8"));
 
-    ranking = generateMatchRank(
-      match,
-      { defeatPoints: 0, victoryPoints: 1 },
-      { bestOf: 5, gameRules: { scoreDistance: 2, scoreMinimum: 11 } }
-    );
+    ranking = generateMatchRank(match, matchRules, setRules);
   });
 
   test("All sets have a winner", () => {
     match.getSets().forEach((set) => {
-      const winner = getSetWinner(set.set, {
-        bestOf: 5,
-        gameRules: { scoreDistance: 2, scoreMinimum: 11 },
-      });
+      const winner = getSetWinner(set.set, setRules);
       if (winner === undefined) {
         fail(`${set.homePlayerId}-${set.awayPlayerId} has no winner`);
       }

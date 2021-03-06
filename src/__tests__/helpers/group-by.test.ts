@@ -1,4 +1,4 @@
-import { groupBy } from "./group-by";
+import { groupBy } from "../../helpers";
 
 describe("groupBy(...)", () => {
   it("should work with an empty array", () => {

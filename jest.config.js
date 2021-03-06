@@ -1,7 +1,7 @@
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
-  testRegex: '/src/.+\.test\.ts$',
+  testRegex: '/src/__tests__\.+\.test\.ts$',
   coverageThreshold: {
     global: {
       branches: 100,

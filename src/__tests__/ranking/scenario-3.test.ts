@@ -1,10 +1,17 @@
-import { TTMatch } from "../tt-match";
-import { generateMatchRank, TTMatchRank } from "../tt-match-rank";
-import { getSetWinner, parseSetScore } from "../tt-set";
+import { getSetWinner } from "../../helpers";
+import { parseSetScore } from "../../parsers";
+import { TTMatchRules, TTSetRules } from "../../rules";
+import { TTMatch } from "../../tt-match";
+import { TTMatchRank, generateMatchRank } from "../../tt-match-rank";
 
 describe("Scenario 3", () => {
   let match: TTMatch<string>;
   let ranking: TTMatchRank<string>;
+  const matchRules: TTMatchRules = { defeatPoints: 0, victoryPoints: 1 };
+  const setRules: TTSetRules = {
+    bestOf: 5,
+    gameRules: { scoreDistance: 2, scoreMinimum: 11 },
+  };
   beforeAll(() => {
     match = new TTMatch<string>();
     const p1 = match.addPlayer("A");
@@ -34,11 +41,7 @@ describe("Scenario 3", () => {
     match.addSet(p3, p5, parseSetScore("11-7,11-5,9-11,10-12,9-11"));
     match.addSet(p1, p2, parseSetScore("11-8,11-7,11-2"));
 
-    ranking = generateMatchRank(
-      match,
-      { defeatPoints: 0, victoryPoints: 1 },
-      { bestOf: 5, gameRules: { scoreDistance: 2, scoreMinimum: 11 } }
-    );
+    ranking = generateMatchRank(match, matchRules, setRules);
   });
 
   test("All sets have a winner", () => {

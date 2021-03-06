@@ -1,9 +1,6 @@
+import { WinLoseRatio, groupBy, getSetWinner, getGameWinner } from "./helpers";
 import { TTMatchRules, TTSetRules } from "./rules";
-import { getSetWinner } from "./tt-set";
 import { TTMatch, TTMatchSet } from "./tt-match";
-import { groupBy } from "./helpers";
-import { getGameWinner } from "./tt-game";
-import { TTRatio } from "./tt-ratio";
 
 export interface TTMatchRank<T> {
   ranked: TTPlayerRank<T>[];
@@ -14,17 +11,17 @@ export interface TTPlayerRank<T> {
   player: T;
   points: number;
   sameRankPoints: number;
-  sameRankGameRatio: TTRatio;
-  sameRankScoreRatio: TTRatio;
-  sameRankGameRatioEvery: TTRatio;
-  sameRankScoreRatioEvery: TTRatio;
+  sameRankGameRatio: WinLoseRatio;
+  sameRankScoreRatio: WinLoseRatio;
+  sameRankGameRatioEvery: WinLoseRatio;
+  sameRankScoreRatioEvery: WinLoseRatio;
 }
 
 interface PointChange {
   id: number;
   points: number;
-  gameRatio: TTRatio;
-  scoreRatio: TTRatio;
+  gameRatio: WinLoseRatio;
+  scoreRatio: WinLoseRatio;
 }
 
 interface MatchRankStep<T> {
@@ -47,10 +44,10 @@ export function generateMatchRank<T>(
         player: x.player,
         points: 0,
         sameRankPoints: 0,
-        sameRankGameRatio: TTRatio.Zero,
-        sameRankScoreRatio: TTRatio.Zero,
-        sameRankGameRatioEvery: TTRatio.Zero,
-        sameRankScoreRatioEvery: TTRatio.Zero,
+        sameRankGameRatio: WinLoseRatio.Zero,
+        sameRankScoreRatio: WinLoseRatio.Zero,
+        sameRankGameRatioEvery: WinLoseRatio.Zero,
+        sameRankScoreRatioEvery: WinLoseRatio.Zero,
       };
     }
   );
@@ -73,9 +70,9 @@ export function generateMatchRank<T>(
     //  Step 3: Game W/L ratio (between themselves)
     {
       set: "between",
-      resetChange: (rank) => (rank.sameRankGameRatio = TTRatio.Zero),
+      resetChange: (rank) => (rank.sameRankGameRatio = WinLoseRatio.Zero),
       applyChange: (rank, mod) =>
-        (rank.sameRankGameRatio = TTRatio.sum(
+        (rank.sameRankGameRatio = WinLoseRatio.sum(
           rank.sameRankGameRatio,
           mod.gameRatio
         )),
@@ -84,9 +81,9 @@ export function generateMatchRank<T>(
     //  Step 4: Score W/L Ratio (between themselves)
     {
       set: "between",
-      resetChange: (rank) => (rank.sameRankScoreRatio = TTRatio.Zero),
+      resetChange: (rank) => (rank.sameRankScoreRatio = WinLoseRatio.Zero),
       applyChange: (rank, mod) =>
-        (rank.sameRankScoreRatio = TTRatio.sum(
+        (rank.sameRankScoreRatio = WinLoseRatio.sum(
           rank.sameRankScoreRatio,
           mod.scoreRatio
         )),
@@ -95,9 +92,9 @@ export function generateMatchRank<T>(
     //  Step 5: Game W/L ratio (including other sets)
     {
       set: "every",
-      resetChange: (rank) => (rank.sameRankGameRatioEvery = TTRatio.Zero),
+      resetChange: (rank) => (rank.sameRankGameRatioEvery = WinLoseRatio.Zero),
       applyChange: (rank, mod) =>
-        (rank.sameRankGameRatioEvery = TTRatio.sum(
+        (rank.sameRankGameRatioEvery = WinLoseRatio.sum(
           rank.sameRankGameRatioEvery,
           mod.gameRatio
         )),
@@ -106,9 +103,9 @@ export function generateMatchRank<T>(
     //  Step 6: Score W/L ratio (including other sets)
     {
       set: "every",
-      resetChange: (rank) => (rank.sameRankScoreRatioEvery = TTRatio.Zero),
+      resetChange: (rank) => (rank.sameRankScoreRatioEvery = WinLoseRatio.Zero),
       applyChange: (rank, mod) =>
-        (rank.sameRankScoreRatioEvery = TTRatio.sum(
+        (rank.sameRankScoreRatioEvery = WinLoseRatio.sum(
           rank.sameRankScoreRatioEvery,
           mod.scoreRatio
         )),
@@ -269,8 +266,8 @@ function getPointChanges(
         pointChanges.push({
           id: matchSet.homePlayerId,
           points: matchRules.victoryPoints,
-          gameRatio: TTRatio.Zero,
-          scoreRatio: TTRatio.Zero,
+          gameRatio: WinLoseRatio.Zero,
+          scoreRatio: WinLoseRatio.Zero,
         });
       }
 
@@ -278,8 +275,8 @@ function getPointChanges(
         pointChanges.push({
           id: matchSet.awayPlayerId,
           points: matchRules.victoryPoints,
-          gameRatio: TTRatio.Zero,
-          scoreRatio: TTRatio.Zero,
+          gameRatio: WinLoseRatio.Zero,
+          scoreRatio: WinLoseRatio.Zero,
         });
       }
     } else {
@@ -287,8 +284,8 @@ function getPointChanges(
         pointChanges.push({
           id: matchSet.homePlayerId,
           points: matchRules.victoryPoints,
-          gameRatio: new TTRatio(gamesWonByHome, gamesWonByAway),
-          scoreRatio: new TTRatio(
+          gameRatio: new WinLoseRatio(gamesWonByHome, gamesWonByAway),
+          scoreRatio: new WinLoseRatio(
             games.reduce((pv, cv) => pv + cv.homeScore, 0),
             games.reduce((pv, cv) => pv + cv.awayScore, 0)
           ),
@@ -296,8 +293,8 @@ function getPointChanges(
         pointChanges.push({
           id: matchSet.awayPlayerId,
           points: matchRules.defeatPoints,
-          gameRatio: new TTRatio(gamesWonByAway, gamesWonByHome),
-          scoreRatio: new TTRatio(
+          gameRatio: new WinLoseRatio(gamesWonByAway, gamesWonByHome),
+          scoreRatio: new WinLoseRatio(
             games.reduce((pv, cv) => pv + cv.awayScore, 0),
             games.reduce((pv, cv) => pv + cv.homeScore, 0)
           ),
@@ -307,8 +304,8 @@ function getPointChanges(
         pointChanges.push({
           id: matchSet.awayPlayerId,
           points: matchRules.victoryPoints,
-          gameRatio: new TTRatio(gamesWonByAway, gamesWonByHome),
-          scoreRatio: new TTRatio(
+          gameRatio: new WinLoseRatio(gamesWonByAway, gamesWonByHome),
+          scoreRatio: new WinLoseRatio(
             games.reduce((pv, cv) => pv + cv.awayScore, 0),
             games.reduce((pv, cv) => pv + cv.homeScore, 0)
           ),
@@ -316,8 +313,8 @@ function getPointChanges(
         pointChanges.push({
           id: matchSet.homePlayerId,
           points: matchRules.defeatPoints,
-          gameRatio: new TTRatio(gamesWonByHome, gamesWonByAway),
-          scoreRatio: new TTRatio(
+          gameRatio: new WinLoseRatio(gamesWonByHome, gamesWonByAway),
+          scoreRatio: new WinLoseRatio(
             games.reduce((pv, cv) => pv + cv.homeScore, 0),
             games.reduce((pv, cv) => pv + cv.awayScore, 0)
           ),

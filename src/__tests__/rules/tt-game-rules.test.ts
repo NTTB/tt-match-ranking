@@ -1,4 +1,4 @@
-import { assertGameRules } from "./tt-game-rules";
+import { assertGameRules } from "../../rules/tt-game-rules";
 
 test("should throw when scoreMinimum is lower than scoreDistance ", () => {
   const call = () => assertGameRules({ scoreMinimum: 1, scoreDistance: 2 });
