@@ -147,7 +147,6 @@ function generateMatchRankStep<T>(
     return;
   }
 
-  if (stepIndex < 0) throw new Error("stepIndex must be 0 or bigger");
   if (stepIndex >= steps.length) {
     result.ranked.push(...remaining);
     return;
@@ -157,7 +156,8 @@ function generateMatchRankStep<T>(
   const sets = filterSets(
     match.getSets(),
     step.set,
-    remaining.map((x) => x.id)
+    remaining.map((x) => x.id),
+    setRules,
   );
 
   remaining.forEach((rank) => {
@@ -213,9 +213,11 @@ function generateMatchRankStep<T>(
 function filterSets(
   sets: TTMatchSet[],
   filter: "between" | "every",
-  playerIds: number[]
+  playerIds: number[],
+  setRules: TTSetRules,
 ): TTMatchSet[] {
-  return sets.filter((ms) => {
+  const completeSets = sets.filter(x => (x.set.walkover || getSetWinner(x.set, setRules)) != undefined);
+  return completeSets.filter((ms) => {
     if (filter === "between") {
       return (
         playerIds.includes(ms.awayPlayerId) &&
