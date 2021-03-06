@@ -1,30 +1,5 @@
-import {
-  TTGame,
-  getGameAdvantage,
-  getGameWinner,
-  parseGameScore,
-} from "./tt-game";
+import { TTGame, getGameWinner, parseGameScore } from "./tt-game";
 import { TTGameRules } from "./rules";
-
-describe("getGameAdvantage(...)", () => {
-  test.each`
-    homeScore | awayScore | expected
-    ${0}      | ${0}      | ${undefined}
-    ${1}      | ${0}      | ${"home"}
-    ${99}     | ${0}      | ${"home"}
-    ${99}     | ${98}     | ${"home"}
-    ${0}      | ${1}      | ${"away"}
-    ${0}      | ${99}     | ${"away"}
-    ${98}     | ${99}     | ${"away"}
-    ${99}     | ${99}     | ${undefined}
-  `(
-    `At $homeScore - $awayScore the advantage is $expected`,
-    ({ homeScore, awayScore, expected }) => {
-      const game: TTGame = { homeScore, awayScore };
-      expect(getGameAdvantage(game)).toBe(expected);
-    }
-  );
-});
 
 describe("getGameWinner(...)", () => {
   test.each`
