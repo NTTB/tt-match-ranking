@@ -27,7 +27,7 @@ describe("Walkover scenarios", () => {
     gameRules = { scoreDistance: 2, scoreMinimum: 11 };
     setRules = {
       bestOf: 3,
-      gameRules: gameRules
+      gameRules: gameRules,
     };
     matchRules = { defeatPoints: 1, victoryPoints: 2 };
   });
@@ -57,7 +57,7 @@ describe("Walkover scenarios", () => {
       ranking = generateMatchRank(match, matchRules, setRules);
     });
 
-    it('should have all 6 players', () => {
+    it("should have all 6 players", () => {
       expect(ranking.ranked).toHaveLength(6);
     });
   });
@@ -88,12 +88,12 @@ describe("Walkover scenarios", () => {
       ranking = generateMatchRank(match, matchRules, setRules);
     });
 
-    it('should have 5 players', () => {
-      expect(ranking.ranked.map(x => x.player)).toHaveLength(5);
+    it("should have 5 players", () => {
+      expect(ranking.ranked.map((x) => x.player)).toHaveLength(5);
     });
 
-    it('should NOT list player A', () => {
-      expect(ranking.ranked.map(x => x.player)).not.toContain("A");
+    it("should NOT list player A", () => {
+      expect(ranking.ranked.map((x) => x.player)).not.toContain("A");
     });
   });
 });

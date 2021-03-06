@@ -7,10 +7,6 @@ describe("Incomplete scenario", () => {
   let match: TTMatch<string>;
   let p1: number;
   let p2: number;
-  let p3: number;
-  let p4: number;
-  let p5: number;
-  let p6: number;
 
   let matchRules: TTMatchRules;
   let setRules: TTSetRules;
@@ -19,15 +15,17 @@ describe("Incomplete scenario", () => {
     match = new TTMatch<string>();
     p1 = match.addPlayer("A");
     p2 = match.addPlayer("B");
-    p3 = match.addPlayer("C");
-    p4 = match.addPlayer("F");
-    p5 = match.addPlayer("E");
-    p6 = match.addPlayer("D");
+
+    // The following players are added, but not used.
+    match.addPlayer("C");
+    match.addPlayer("F");
+    match.addPlayer("E");
+    match.addPlayer("D");
 
     gameRules = { scoreDistance: 2, scoreMinimum: 11 };
     setRules = {
       bestOf: 5,
-      gameRules: gameRules
+      gameRules: gameRules,
     };
     matchRules = { defeatPoints: 1, victoryPoints: 2 };
   });
@@ -38,7 +36,7 @@ describe("Incomplete scenario", () => {
       ranking = generateMatchRank(match, matchRules, setRules);
     });
 
-    it('should have all 6 players', () => {
+    it("should have all 6 players", () => {
       expect(ranking.ranked).toHaveLength(6);
     });
   });
@@ -50,11 +48,11 @@ describe("Incomplete scenario", () => {
       ranking = generateMatchRank(match, matchRules, setRules);
     });
 
-    it('should have all 6 players', () => {
+    it("should have all 6 players", () => {
       expect(ranking.ranked).toHaveLength(6);
     });
 
-    it('should have player B be first', () => {
+    it("should have player B be first", () => {
       expect(ranking.ranked[0].player).toBe("B");
     });
   });
@@ -66,15 +64,15 @@ describe("Incomplete scenario", () => {
       ranking = generateMatchRank(match, matchRules, setRules);
     });
 
-    it('should have all 6 players', () => {
+    it("should have all 6 players", () => {
       expect(ranking.ranked).toHaveLength(6);
     });
 
-    it('should have player A be first since the game wasn\'t completed', () => {
+    it("should have player A be first since the game wasn't completed", () => {
       expect(ranking.ranked[0].player).toBe("A");
     });
 
-    [0, 1, 2, 3, 4, 5].forEach(i => {
+    [0, 1, 2, 3, 4, 5].forEach((i) => {
       it(`ranking.ranked[${i}] should have zero sameRankScoreRatioEvery`, () => {
         const r = ranking.ranked[i];
 

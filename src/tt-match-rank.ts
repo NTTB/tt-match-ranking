@@ -75,10 +75,10 @@ export function generateMatchRank<T>(
       set: "between",
       resetChange: (rank) => (rank.sameRankGameRatio = TTRatio.Zero),
       applyChange: (rank, mod) =>
-      (rank.sameRankGameRatio = TTRatio.sum(
-        rank.sameRankGameRatio,
-        mod.gameRatio
-      )),
+        (rank.sameRankGameRatio = TTRatio.sum(
+          rank.sameRankGameRatio,
+          mod.gameRatio
+        )),
       groupAndSortBy: (k) => k.sameRankGameRatio.ratio,
     },
     //  Step 4: Score W/L Ratio (between themselves)
@@ -86,10 +86,10 @@ export function generateMatchRank<T>(
       set: "between",
       resetChange: (rank) => (rank.sameRankScoreRatio = TTRatio.Zero),
       applyChange: (rank, mod) =>
-      (rank.sameRankScoreRatio = TTRatio.sum(
-        rank.sameRankScoreRatio,
-        mod.scoreRatio
-      )),
+        (rank.sameRankScoreRatio = TTRatio.sum(
+          rank.sameRankScoreRatio,
+          mod.scoreRatio
+        )),
       groupAndSortBy: (k) => k.sameRankScoreRatio.ratio,
     },
     //  Step 5: Game W/L ratio (including other sets)
@@ -97,10 +97,10 @@ export function generateMatchRank<T>(
       set: "every",
       resetChange: (rank) => (rank.sameRankGameRatioEvery = TTRatio.Zero),
       applyChange: (rank, mod) =>
-      (rank.sameRankGameRatioEvery = TTRatio.sum(
-        rank.sameRankGameRatioEvery,
-        mod.gameRatio
-      )),
+        (rank.sameRankGameRatioEvery = TTRatio.sum(
+          rank.sameRankGameRatioEvery,
+          mod.gameRatio
+        )),
       groupAndSortBy: (k) => k.sameRankGameRatioEvery.ratio,
     },
     //  Step 6: Score W/L ratio (including other sets)
@@ -108,10 +108,10 @@ export function generateMatchRank<T>(
       set: "every",
       resetChange: (rank) => (rank.sameRankScoreRatioEvery = TTRatio.Zero),
       applyChange: (rank, mod) =>
-      (rank.sameRankScoreRatioEvery = TTRatio.sum(
-        rank.sameRankScoreRatioEvery,
-        mod.scoreRatio
-      )),
+        (rank.sameRankScoreRatioEvery = TTRatio.sum(
+          rank.sameRankScoreRatioEvery,
+          mod.scoreRatio
+        )),
       groupAndSortBy: (k) => k.sameRankScoreRatioEvery.ratio,
     },
   ];
@@ -157,7 +157,7 @@ function generateMatchRankStep<T>(
     match.getSets(),
     step.set,
     remaining.map((x) => x.id),
-    setRules,
+    setRules
   );
 
   remaining.forEach((rank) => {
@@ -214,9 +214,11 @@ function filterSets(
   sets: TTMatchSet[],
   filter: "between" | "every",
   playerIds: number[],
-  setRules: TTSetRules,
+  setRules: TTSetRules
 ): TTMatchSet[] {
-  const completeSets = sets.filter(x => (x.set.walkover || getSetWinner(x.set, setRules)) != undefined);
+  const completeSets = sets.filter(
+    (x) => (x.set.walkover || getSetWinner(x.set, setRules)) != undefined
+  );
   return completeSets.filter((ms) => {
     if (filter === "between") {
       return (
