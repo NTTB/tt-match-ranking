@@ -2,7 +2,11 @@
   "name": "tt-match-ranking",
   "version": "0.9.0-beta.0",
   "description": "Table tennis match ranking library",
-  "main": "jest.config.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/"
+  ],
   "scripts": {
     "build": "tsc",
     "lint": "eslint src",
