@@ -1,7 +1,7 @@
 {
-  "name": "tt-utility",
+  "name": "tt-match-ranking",
   "version": "0.9.0-beta.0",
-  "description": "",
+  "description": "Table tennis match ranking library",
   "main": "jest.config.js",
   "scripts": {
     "build": "tsc",
@@ -16,18 +16,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/NTTB/tt-utility.git"
+    "url": "git+https://github.com/NTTB/tt-match-ranking.git"
   },
   "keywords": [
-    "table-tennis",
+    "table tennis",
+    "ranking",
     "utility"
   ],
   "author": "Wouter Lindenhof",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/NTTB/tt-utility/issues"
+    "url": "https://github.com/NTTB/tt-match-ranking/issues"
   },
-  "homepage": "https://github.com/NTTB/tt-utility#readme",
+  "homepage": "https://github.com/NTTB/tt-match-ranking#readme",
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^4.15.1",
     "@typescript-eslint/parser": "^4.15.1",
