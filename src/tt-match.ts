@@ -36,7 +36,7 @@ export class TTMatch<T> {
     return this.sets;
   }
 
-  addSet(set: TTSet, homePlayerId: number, awayPlayerId: number): number {
+  addSet(homePlayerId: number, awayPlayerId: number, set: TTSet): number {
     if (homePlayerId == awayPlayerId)
       throw new Error("The homePlayerId and awayPlayerId cannot be the same");
     if (!this.isPlayerIdKnown(homePlayerId))

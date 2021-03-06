@@ -14,25 +14,25 @@ describe("Scenario 3", () => {
     const p5 = match.addPlayer("E");
     const p6 = match.addPlayer("F");
 
-    match.addSet(parseSetScore("9-11,8-11,9-11"), p3, p4);
-    match.addSet(parseSetScore("7-11,9-11,9-11"), p2, p5);
-    match.addSet(parseSetScore("10-12,10-12,10-12"), p1, p6);
+    match.addSet(p3, p4, parseSetScore("9-11,8-11,9-11"));
+    match.addSet(p2, p5, parseSetScore("7-11,9-11,9-11"));
+    match.addSet(p1, p6, parseSetScore("10-12,10-12,10-12"));
 
-    match.addSet(parseSetScore("11-7,11-4,11-6"), p2, p4);
-    match.addSet(parseSetScore("11-3,11-7,11-9"), p3, p6);
-    match.addSet(parseSetScore("11-7,11-5,11-2"), p1, p5);
+    match.addSet(p2, p4, parseSetScore("11-7,11-4,11-6"));
+    match.addSet(p3, p6, parseSetScore("11-3,11-7,11-9"));
+    match.addSet(p1, p5, parseSetScore("11-7,11-5,11-2"));
 
-    match.addSet(parseSetScore("11-9,11-5,11-8"), p5, p6);
-    match.addSet(parseSetScore("6-11,9-11,10-12"), p2, p3);
-    match.addSet(parseSetScore("11-3,11-0,11-4"), p1, p4);
+    match.addSet(p5, p6, parseSetScore("11-9,11-5,11-8"));
+    match.addSet(p2, p3, parseSetScore("6-11,9-11,10-12"));
+    match.addSet(p1, p4, parseSetScore("11-3,11-0,11-4"));
 
-    match.addSet(parseSetScore("11-7,11-7,11-8"), p2, p6);
-    match.addSet(parseSetScore("11-8,11-9,11-5"), p4, p5);
-    match.addSet(parseSetScore("7-11,10-12,8-11"), p1, p3);
+    match.addSet(p2, p6, parseSetScore("11-7,11-7,11-8"));
+    match.addSet(p4, p5, parseSetScore("11-8,11-9,11-5"));
+    match.addSet(p1, p3, parseSetScore("7-11,10-12,8-11"));
 
-    match.addSet(parseSetScore("5-11,4-11,8-11"), p4, p6);
-    match.addSet(parseSetScore("11-7,11-5,9-11,10-12,9-11"), p3, p5);
-    match.addSet(parseSetScore("11-8,11-7,11-2"), p1, p2);
+    match.addSet(p4, p6, parseSetScore("5-11,4-11,8-11"));
+    match.addSet(p3, p5, parseSetScore("11-7,11-5,9-11,10-12,9-11"));
+    match.addSet(p1, p2, parseSetScore("11-8,11-7,11-2"));
 
     ranking = generateMatchRank(
       match,

@@ -86,7 +86,7 @@ describe("Match and sets", () => {
   });
 
   test("Should throw when adding a set with the same playerId", () => {
-    const act = () => match.addSet({ games: [] }, 0, 0);
+    const act = () => match.addSet(0, 0, { games: [] });
     expect(act).toThrowError(
       /The homePlayerId and awayPlayerId cannot be the same/
     );
@@ -94,13 +94,13 @@ describe("Match and sets", () => {
 
   test("Should throw when adding a set with homePlayerId not registered", () => {
     match.addPlayer(p1);
-    const act = () => match.addSet({ games: [] }, 2, 1);
+    const act = () => match.addSet(2, 1, { games: [] });
     expect(act).toThrowError(/The homePlayerId is not part of this match/);
   });
 
   test("Should throw when adding a set with awayPlayerId not registered", () => {
     match.addPlayer(p1);
-    const act = () => match.addSet({ games: [] }, 1, 2);
+    const act = () => match.addSet(1, 2, { games: [] });
     expect(act).toThrowError(/The awayPlayerId is not part of this match/);
   });
 
@@ -110,16 +110,16 @@ describe("Match and sets", () => {
     match.addPlayer(p3);
     match.addPlayer(p4);
     const set: TTSet = { games: [] };
-    match.addSet(set, 1, 2); // This one is allowed
+    match.addSet(1, 2, set); // This one is allowed
 
-    const act = () => match.addSet(set, 3, 4);
+    const act = () => match.addSet(3, 4, set);
     expect(act).toThrowError(/The set was already added to the match/);
   });
 
   test("Adding a set should increase the listed set", () => {
     match.addPlayer(p1);
     match.addPlayer(p2);
-    match.addSet({ games: [] }, 1, 2);
+    match.addSet(1, 2, { games: [] });
     expect(match.getSets().length).toBe(1);
   });
 
@@ -129,11 +129,11 @@ describe("Match and sets", () => {
     match.addPlayer(p3);
     match.addPlayer(p4);
     match.addPlayer(p5);
-    const sId1 = match.addSet({ games: [] }, 1, 2);
-    const sId2 = match.addSet({ games: [] }, 1, 3);
-    const sId3 = match.addSet({ games: [] }, 1, 4);
-    const sId4 = match.addSet({ games: [] }, 1, 5);
-    const sId5 = match.addSet({ games: [] }, 2, 1);
+    const sId1 = match.addSet(1, 2, { games: [] });
+    const sId2 = match.addSet(1, 3, { games: [] });
+    const sId3 = match.addSet(1, 4, { games: [] });
+    const sId4 = match.addSet(1, 5, { games: [] });
+    const sId5 = match.addSet(2, 1, { games: [] });
 
     expect(sId1).toBe(1);
     expect(sId2).toBe(2);
@@ -155,11 +155,11 @@ describe("Match and sets", () => {
       match.addPlayer(p4);
       match.addPlayer(p5);
 
-      match.addSet(s1, 1, 2);
-      match.addSet(s2, 1, 3);
-      match.addSet(s3, 1, 4);
-      match.addSet(s4, 1, 5);
-      match.addSet(s5, 2, 1);
+      match.addSet(1, 2, s1);
+      match.addSet(1, 3, s2);
+      match.addSet(1, 4, s3);
+      match.addSet(1, 5, s4);
+      match.addSet(2, 1, s5);
     });
 
     test.each`

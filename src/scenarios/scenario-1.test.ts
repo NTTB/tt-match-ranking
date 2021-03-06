@@ -14,25 +14,25 @@ describe("Scenario 1", () => {
     const p5 = match.addPlayer("E");
     const p6 = match.addPlayer("F");
 
-    match.addSet(parseSetScore("11-7,11-3,11-9"), p3, p4);
-    match.addSet(parseSetScore("11-8,11-5,9-11,11-9"), p2, p5);
-    match.addSet(parseSetScore("11-4,9-11,7-11,11-8,12-10"), p1, p6);
+    match.addSet(p3, p4, parseSetScore("11-7,11-3,11-9"));
+    match.addSet(p2, p5, parseSetScore("11-8,11-5,9-11,11-9"));
+    match.addSet(p1, p6, parseSetScore("11-4,9-11,7-11,11-8,12-10"));
 
-    match.addSet(parseSetScore("11-8,7-11,11-9,11-5"), p2, p4);
-    match.addSet(parseSetScore("11-9,9-11,7-11,12-10,11-8"), p3, p6);
-    match.addSet(parseSetScore("11-6,11-8,11-6"), p1, p5);
+    match.addSet(p2, p4, parseSetScore("11-8,7-11,11-9,11-5"));
+    match.addSet(p3, p6, parseSetScore("11-9,9-11,7-11,12-10,11-8"));
+    match.addSet(p1, p5, parseSetScore("11-6,11-8,11-6"));
 
-    match.addSet(parseSetScore("8-11,11-7,11-6,9-11,11-8"), p5, p6);
-    match.addSet(parseSetScore("11-8,11-9,11-7"), p2, p3);
-    match.addSet(parseSetScore("11-5,11-3,11-6"), p1, p4);
+    match.addSet(p5, p6, parseSetScore("8-11,11-7,11-6,9-11,11-8"));
+    match.addSet(p2, p3, parseSetScore("11-8,11-9,11-7"));
+    match.addSet(p1, p4, parseSetScore("11-5,11-3,11-6"));
 
-    match.addSet(parseSetScore("11-6,11-5,11-8"), p2, p6);
-    match.addSet(parseSetScore("9-11,12-10,11-5,11-8"), p4, p5);
-    match.addSet(parseSetScore("11-8,11-7,11-5"), p1, p3);
+    match.addSet(p2, p6, parseSetScore("11-6,11-5,11-8"));
+    match.addSet(p4, p5, parseSetScore("9-11,12-10,11-5,11-8"));
+    match.addSet(p1, p3, parseSetScore("11-8,11-7,11-5"));
 
-    match.addSet(parseSetScore("11-7,11-5,10-12,11-9"), p4, p6);
-    match.addSet(parseSetScore("11-8,11-8,11-7"), p3, p5);
-    match.addSet(parseSetScore("8-11,7-11,11-9,12-10,11-8"), p1, p2);
+    match.addSet(p4, p6, parseSetScore("11-7,11-5,10-12,11-9"));
+    match.addSet(p3, p5, parseSetScore("11-8,11-8,11-7"));
+    match.addSet(p1, p2, parseSetScore("8-11,7-11,11-9,12-10,11-8"));
 
     ranking = generateMatchRank(
       match,

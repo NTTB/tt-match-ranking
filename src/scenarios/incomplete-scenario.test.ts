@@ -44,7 +44,7 @@ describe("Incomplete scenario", () => {
   describe("Only a single set is complete", () => {
     let ranking: TTMatchRank<string>;
     beforeEach(() => {
-      match.addSet(parseSetScore("0-11,0-11,0-11"), p1, p2);
+      match.addSet(p1, p2, parseSetScore("0-11,0-11,0-11"));
       ranking = generateMatchRank(match, matchRules, setRules);
     });
 
@@ -60,7 +60,7 @@ describe("Incomplete scenario", () => {
   describe("Only a single incomplete set", () => {
     let ranking: TTMatchRank<string>;
     beforeEach(() => {
-      match.addSet(parseSetScore("0-11,0-11,0-9"), p1, p2);
+      match.addSet(p1, p2, parseSetScore("0-11,0-11,0-9"));
       ranking = generateMatchRank(match, matchRules, setRules);
     });
 

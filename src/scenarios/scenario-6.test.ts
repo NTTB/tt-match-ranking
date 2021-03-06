@@ -14,25 +14,25 @@ describe("Scenario 6", () => {
     const p5 = match.addPlayer("E");
     const p6 = match.addPlayer("F");
 
-    match.addSet(parseSetScore("11-5,11-7,10-12,11-2"), p3, p4);
-    match.addSet(parseSetScore("9-11,8-11,11-8,9-11"), p2, p5);
-    match.addSet(parseSetScore("11-8,10-12,11-9,9-11,11-5"), p1, p6);
+    match.addSet(p3, p4, parseSetScore("11-5,11-7,10-12,11-2"));
+    match.addSet(p2, p5, parseSetScore("9-11,8-11,11-8,9-11"));
+    match.addSet(p1, p6, parseSetScore("11-8,10-12,11-9,9-11,11-5"));
 
-    match.addSet(parseSetScore("6-11,5-11,7-11"), p2, p4);
-    match.addSet(parseSetScore("3-11,11-4,11-8,7-11,8-11"), p3, p6);
-    match.addSet(parseSetScore("7-11,11-6,8-11,11-9,4-11"), p1, p5);
+    match.addSet(p2, p4, parseSetScore("6-11,5-11,7-11"));
+    match.addSet(p3, p6, parseSetScore("3-11,11-4,11-8,7-11,8-11"));
+    match.addSet(p1, p5, parseSetScore("7-11,11-6,8-11,11-9,4-11"));
 
-    match.addSet(parseSetScore("7-11,12-10,9-11,13-11,6-11"), p5, p6);
-    match.addSet(parseSetScore("11-5,6-11,3-11,11-7,11-9"), p2, p3);
-    match.addSet(parseSetScore("9-11,11-7,12-10,7-11,11-4"), p1, p4);
+    match.addSet(p5, p6, parseSetScore("7-11,12-10,9-11,13-11,6-11"));
+    match.addSet(p2, p3, parseSetScore("11-5,6-11,3-11,11-7,11-9"));
+    match.addSet(p1, p4, parseSetScore("9-11,11-7,12-10,7-11,11-4"));
 
-    match.addSet(parseSetScore("11-8,11-8,11-8"), p2, p6);
-    match.addSet(parseSetScore("11-6,11-9,11-8"), p4, p5);
-    match.addSet(parseSetScore("13-11,7-11,10-12,7-11"), p1, p3);
+    match.addSet(p2, p6, parseSetScore("11-8,11-8,11-8"));
+    match.addSet(p4, p5, parseSetScore("11-6,11-9,11-8"));
+    match.addSet(p1, p3, parseSetScore("13-11,7-11,10-12,7-11"));
 
-    match.addSet(parseSetScore("7-11,12-10,6-11,11-13"), p4, p6);
-    match.addSet(parseSetScore("4-11,11-13,12-10,12-10,7-11"), p3, p5);
-    match.addSet(parseSetScore("11-9,11-3,6-11,7-11,12-10"), p1, p2);
+    match.addSet(p4, p6, parseSetScore("7-11,12-10,6-11,11-13"));
+    match.addSet(p3, p5, parseSetScore("4-11,11-13,12-10,12-10,7-11"));
+    match.addSet(p1, p2, parseSetScore("11-9,11-3,6-11,7-11,12-10"));
 
     ranking = generateMatchRank(
       match,

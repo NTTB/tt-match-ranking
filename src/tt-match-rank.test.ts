@@ -61,9 +61,9 @@ describe("generateMatchRank(...)", () => {
       beforeEach(() => {
         const p1 = match.addPlayer("home");
         const p2 = match.addPlayer("away");
-        match.addSet(parseSetScore(set1), p1, p2);
-        match.addSet(parseSetScore(set2), p1, p2);
-        match.addSet(parseSetScore(set3), p1, p2);
+        match.addSet(p1, p2, parseSetScore(set1));
+        match.addSet(p1, p2, parseSetScore(set2));
+        match.addSet(p1, p2, parseSetScore(set3));
       });
 
       test(`${ranked.join(",") || "none"} should be ranked`, () => {
@@ -123,12 +123,12 @@ describe("generateMatchRank(...)", () => {
       const p2 = match.addPlayer("B");
       const p3 = match.addPlayer("C");
       const p4 = match.addPlayer("D");
-      match.addSet(parseSetScore(s1_2), p1, p2);
-      match.addSet(parseSetScore(s1_3), p1, p3);
-      match.addSet(parseSetScore(s1_4), p1, p4);
-      match.addSet(parseSetScore(s2_3), p2, p3);
-      match.addSet(parseSetScore(s2_4), p2, p4);
-      match.addSet(parseSetScore(s3_4), p3, p4);
+      match.addSet(p1, p2, parseSetScore(s1_2));
+      match.addSet(p1, p3, parseSetScore(s1_3));
+      match.addSet(p1, p4, parseSetScore(s1_4));
+      match.addSet(p2, p3, parseSetScore(s2_3));
+      match.addSet(p2, p4, parseSetScore(s2_4));
+      match.addSet(p3, p4, parseSetScore(s3_4));
       const result = generateMatchRank(
         match,
         { victoryPoints: 2, defeatPoints: 1 },
@@ -164,7 +164,7 @@ describe("generateMatchRank(...)", () => {
     beforeEach(() => {
       const A = match.addPlayer("A");
       const B = match.addPlayer("B");
-      match.addSet(parseSetScore(a_vs_b), A, B);
+      match.addSet(A, B, parseSetScore(a_vs_b));
       result = generateMatchRank(
         match,
         { victoryPoints: 2, defeatPoints: 1 },
@@ -217,12 +217,12 @@ describe("generateMatchRank(...)", () => {
         const B = match.addPlayer("B");
         const C = match.addPlayer("C");
         const D = match.addPlayer("D");
-        match.addSet(parseSetScore(a_vs_b), A, B);
-        match.addSet(parseSetScore(a_vs_c), A, C);
-        match.addSet(parseSetScore(a_vs_d), A, D);
-        match.addSet(parseSetScore(b_vs_c), B, C);
-        match.addSet(parseSetScore(b_vs_d), B, D);
-        match.addSet(parseSetScore(c_vs_d), C, D);
+        match.addSet(A, B, parseSetScore(a_vs_b));
+        match.addSet(A, C, parseSetScore(a_vs_c));
+        match.addSet(A, D, parseSetScore(a_vs_d));
+        match.addSet(B, C, parseSetScore(b_vs_c));
+        match.addSet(B, D, parseSetScore(b_vs_d));
+        match.addSet(C, D, parseSetScore(c_vs_d));
         result = generateMatchRank(
           match,
           { victoryPoints: 2, defeatPoints: 1 },

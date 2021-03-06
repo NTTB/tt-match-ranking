@@ -35,25 +35,25 @@ describe("Walkover scenarios", () => {
   describe("One player has walked away from most games", () => {
     let ranking: TTMatchRank<string>;
     beforeEach(() => {
-      match.addSet(parseSetScore("wo:home"), p1, p2);
-      match.addSet(parseSetScore("wo:home"), p1, p3);
-      match.addSet(parseSetScore("0-11, 0-11"), p1, p4);
-      match.addSet(parseSetScore("11-0,11-0"), p1, p5);
-      match.addSet(parseSetScore("0-11,0-11"), p1, p6);
+      match.addSet(p1, p2, parseSetScore("wo:home"));
+      match.addSet(p1, p3, parseSetScore("wo:home"));
+      match.addSet(p1, p4, parseSetScore("0-11, 0-11"));
+      match.addSet(p1, p5, parseSetScore("11-0,11-0"));
+      match.addSet(p1, p6, parseSetScore("0-11,0-11"));
 
-      match.addSet(parseSetScore("0-11,0-11"), p2, p3);
-      match.addSet(parseSetScore("0-11, 0-11"), p2, p4);
-      match.addSet(parseSetScore("11-0,11-0"), p2, p5);
-      match.addSet(parseSetScore("0-11,0-11"), p2, p6);
+      match.addSet(p2, p3, parseSetScore("0-11,0-11"));
+      match.addSet(p2, p4, parseSetScore("0-11, 0-11"));
+      match.addSet(p2, p5, parseSetScore("11-0,11-0"));
+      match.addSet(p2, p6, parseSetScore("0-11,0-11"));
 
-      match.addSet(parseSetScore("0-11, 0-11"), p3, p4);
-      match.addSet(parseSetScore("11-0,11-0"), p3, p5);
-      match.addSet(parseSetScore("0-11,0-11"), p3, p6);
+      match.addSet(p3, p4, parseSetScore("0-11, 0-11"));
+      match.addSet(p3, p5, parseSetScore("11-0,11-0"));
+      match.addSet(p3, p6, parseSetScore("0-11,0-11"));
 
-      match.addSet(parseSetScore("11-0,11-0"), p4, p5);
-      match.addSet(parseSetScore("0-11,0-11"), p4, p6);
+      match.addSet(p4, p5, parseSetScore("11-0,11-0"));
+      match.addSet(p4, p6, parseSetScore("0-11,0-11"));
 
-      match.addSet(parseSetScore("11-0,11-0"), p5, p6);
+      match.addSet(p5, p6, parseSetScore("11-0,11-0"));
       ranking = generateMatchRank(match, matchRules, setRules);
     });
 
@@ -65,25 +65,25 @@ describe("Walkover scenarios", () => {
   describe("One player has always walked away", () => {
     let ranking: TTMatchRank<string>;
     beforeEach(() => {
-      match.addSet(parseSetScore("wo:away"), p1, p2);
-      match.addSet(parseSetScore("wo:away"), p1, p3);
-      match.addSet(parseSetScore("wo:away"), p1, p4);
-      match.addSet(parseSetScore("wo:away"), p1, p5);
-      match.addSet(parseSetScore("wo:away"), p1, p6);
+      match.addSet(p1, p2, parseSetScore("wo:away"));
+      match.addSet(p1, p3, parseSetScore("wo:away"));
+      match.addSet(p1, p4, parseSetScore("wo:away"));
+      match.addSet(p1, p5, parseSetScore("wo:away"));
+      match.addSet(p1, p6, parseSetScore("wo:away"));
 
-      match.addSet(parseSetScore("0-11,0-11"), p2, p3);
-      match.addSet(parseSetScore("0-11, 0-11"), p2, p4);
-      match.addSet(parseSetScore("11-0,11-0"), p2, p5);
-      match.addSet(parseSetScore("0-11,0-11"), p2, p6);
+      match.addSet(p2, p3, parseSetScore("0-11,0-11"));
+      match.addSet(p2, p4, parseSetScore("0-11, 0-11"));
+      match.addSet(p2, p5, parseSetScore("11-0,11-0"));
+      match.addSet(p2, p6, parseSetScore("0-11,0-11"));
 
-      match.addSet(parseSetScore("0-11, 0-11"), p3, p4);
-      match.addSet(parseSetScore("11-0,11-0"), p3, p5);
-      match.addSet(parseSetScore("0-11,0-11"), p3, p6);
+      match.addSet(p3, p4, parseSetScore("0-11, 0-11"));
+      match.addSet(p3, p5, parseSetScore("11-0,11-0"));
+      match.addSet(p3, p6, parseSetScore("0-11,0-11"));
 
-      match.addSet(parseSetScore("11-0,11-0"), p4, p5);
-      match.addSet(parseSetScore("0-11,0-11"), p4, p6);
+      match.addSet(p4, p5, parseSetScore("11-0,11-0"));
+      match.addSet(p4, p6, parseSetScore("0-11,0-11"));
 
-      match.addSet(parseSetScore("11-0,11-0"), p5, p6);
+      match.addSet(p5, p6, parseSetScore("11-0,11-0"));
 
       ranking = generateMatchRank(match, matchRules, setRules);
     });
