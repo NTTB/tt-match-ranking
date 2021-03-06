@@ -1,5 +1,5 @@
 {
-  "name": "tt-match-ranking",
+  "name": "@nttb/tt-match-ranking",
   "version": "0.9.0-beta.0",
   "description": "Table tennis match ranking library",
   "main": "dist/index.js",
