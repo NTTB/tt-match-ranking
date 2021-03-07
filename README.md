@@ -15,6 +15,10 @@ It follows the official NTTB rules for tournaments.
 npm i @nttb/tt-match-ranking
 ```
 
+## Documentation
+
+You can find the documentation here: <https://nttb.github.io/tt-match-ranking/>
+
 ## FAQ
 
 - **Q:** The top-most data type is `TTMatch` shouldn't that be called a competiton or tournament?  
@@ -24,7 +28,7 @@ npm i @nttb/tt-match-ranking
 - **Q:** How well tested is this library?  
   **A:** The library was created through test driven development and has a 100% test coverage, meaning that all functionality was written because an earlier test case demanded it. We are certain that all official scenarios are tested and we even added a few tests for unofficial edge cases such as when games or sets aren't completed. However like every piece of code the "absence of proof" is not "proof of absence".
 - **Q:** Can I use the library in javascript instead of typescript?  
-  **A:** Yes, the library is compiled to javascript from typescript without any dependencies. The example only uses typescript as it better displays the functionality.
+  **A:** Yes, the library is compiled to javascript from typescript without any dependencies. The example only uses typescript as it better displays the functionality. 
 
 ## Example
 
