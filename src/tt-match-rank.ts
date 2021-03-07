@@ -2,20 +2,75 @@ import { WinLoseRatio, groupBy, getSetWinner, getGameWinner } from "./helpers";
 import { TTMatchRules, TTSetRules } from "./rules";
 import { TTMatch, TTMatchSet } from "./tt-match";
 
+/**
+ * The ranking of a match.
+ * @typeParam T The type that describes each player
+ */
 export interface TTMatchRank<T> {
+  /** The players sorted by rank */
   ranked: TTPlayerRank<T>[];
 }
 
+/**
+ * The rank reuslt of a player
+ */
 export interface TTPlayerRank<T> {
+  /** The id of the player when it was added to the match */
   id: number;
+
+  /** The data that was used to describe the player when added to the match */
   player: T;
+
+  /** The number of points gained from a match */
   points: number;
-  sameRankPoints: number;
-  sameRankGameRatio: WinLoseRatio;
-  sameRankScoreRatio: WinLoseRatio;
-  sameRankGameRatioEvery: WinLoseRatio;
-  sameRankScoreRatioEvery: WinLoseRatio;
+
+  /** With which playerIds the player has to share his rank and that require a coin flip. */
   sharedWith: number[];
+
+  /**
+   * @internal Used for internal calculations
+   * @deprecated Likely to be moved in future versions as it exposes internal calculation state.
+   * Describes the points the player has when only looking at games of players who share the same points count.
+   */
+  sameRankPoints: number;
+
+  /**
+   * @internal Used for internal calculations
+   * @deprecated Likely to be moved in future versions as it exposes internal calculation state.
+   * The games the player has won/lost the same sameRankPoints among the players with the
+   * - same sameRankPoints
+   */
+  sameRankGameRatio: WinLoseRatio;
+
+  /**
+   * @internal Used for internal calculations
+   * @deprecated Likely to be moved in future versions as it exposes internal calculation state.
+   * The score the player has won/lost among the players with the
+   * - same sameRankPoints
+   * - same sameRankGameRatio
+   */
+  sameRankScoreRatio: WinLoseRatio;
+
+  /**
+   * @internal Used for internal calculations
+   * @deprecated Likely to be moved in future versions as it exposes internal calculation state.
+   * The games the player has won/lost among all played matches when
+   * - same sameRankPoints
+   * - same sameRankGameRatio
+   * - same sameRankScoreRatio
+   */
+  sameRankGameRatioEvery: WinLoseRatio;
+
+  /**
+   * @internal Used for internal calculations
+   * @deprecated Likely to be moved in future versions as it exposes internal calculation state.
+   * The scores the player has won/lost among all played matches when
+   * - same sameRankPoints
+   * - same sameRankGameRatio
+   * - same sameRankScoreRatio
+   * - same sameRankGameRatioEvery
+   */
+  sameRankScoreRatioEvery: WinLoseRatio;
 }
 
 interface PointChange {
@@ -32,6 +87,13 @@ interface MatchRankStep<T> {
   groupAndSortBy: (k: TTPlayerRank<T>) => number;
 }
 
+/**
+ * Generates the ranking.
+ * @param match The match of which the players need to be ranked
+ * @param matchRules The rules of the match
+ * @param setRules The rules for every set
+ * @returns The ranking sorted according to the table tennis rules.
+ */
 export function generateMatchRank<T>(
   match: TTMatch<T>,
   matchRules: TTMatchRules,

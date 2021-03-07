@@ -3,6 +3,14 @@ interface GroupBy<TKey, TValue> {
   values: TValue[];
 }
 
+/**
+ * @internal
+ * Groups values in an array
+ * @param src The source array which needs to be grouped
+ * @param keySelector A function to select the key value to group by
+ * @param valueSelector A function to select the value that will be stored in the group
+ * @returns An array of groups that were found
+ */
 export function groupBy<TSrc, TKey, TVal = TSrc>(
   src: TSrc[],
   keySelector: (v: TSrc) => TKey,

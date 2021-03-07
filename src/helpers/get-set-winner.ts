@@ -2,6 +2,16 @@ import { TTSetRules, assertSetRules } from "../rules";
 import { TTSet } from "../tt-set";
 import { getGameWinner } from "./get-game-winner";
 
+/**
+ * @internal
+ * Determines the winner (if any) of a __played__ set (doesn't work with walkover).
+ * @param set The set that was played
+ * @param rules The rules to determine who has won
+ * @returns
+ * - `home` when the home player has won
+ * - `away` when the away player has won
+ * - `undefined` when no winner can be determined.
+ */
 export function getSetWinner(
   set: TTSet,
   rules: TTSetRules
