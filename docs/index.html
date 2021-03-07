@@ -1,0 +1,244 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>@nttb/tt-match-ranking</title>
+	<meta name="description" content="Documentation for @nttb/tt-match-ranking">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="assets/css/main.css">
+	<script async src="assets/js/search.js" id="search-script"></script>
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.json" data-base=".">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="index.html" class="title">@nttb/tt-match-ranking</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<h1>@nttb/tt-match-ranking</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<div class="tsd-panel tsd-typography">
+				<a href="#table-tennis-match-ranking" id="table-tennis-match-ranking" style="color: inherit; text-decoration: none;">
+					<h1>Table Tennis Match Ranking</h1>
+				</a>
+				<p>A library that calculates the ranking of match (often a tournament) in table tennis.</p>
+				<p>It follows the official NTTB rules for tournaments.</p>
+				<ul>
+					<li>Supports using your own datatypes to define your players</li>
+					<li>Supports various ways of scoring for both game, set and match</li>
+					<li>Supports walkovers (winning because the opponent refuses to player)</li>
+					<li>Supports incomplete games and sets</li>
+				</ul>
+				<a href="#installing" id="installing" style="color: inherit; text-decoration: none;">
+					<h2>Installing</h2>
+				</a>
+				<pre><code class="language-shell"><span style="color: #000000">npm i @nttb/tt-match-ranking</span>
+</code></pre>
+				<a href="#faq" id="faq" style="color: inherit; text-decoration: none;">
+					<h2>FAQ</h2>
+				</a>
+				<ul>
+					<li><strong>Q:</strong> The top-most data type is <code>TTMatch</code> shouldn&#39;t that be called a competiton or tournament?<br><strong>A:</strong> No, but we agree it&#39;s confusing. The naming convention is based on the &quot;game, set and match&quot;. However many table tennis players talk about &quot;winning a set&quot; as if it were &quot;winning a game&quot;.</li>
+					<li><strong>Q:</strong> Why can I only add players/sets but not update them?<br><strong>A:</strong> Although the library looks like it is intended to be used manage a match, the only goal is to calculate the ranking. We recommend creating your own data types for storing and managing and then use this library to calculate the ranking. <em>(We tried to create an all-in-one solution but failed as calculating ranking is quite complex)</em></li>
+					<li><strong>Q:</strong> How well tested is this library?<br><strong>A:</strong> The library was created through test driven development and has a 100% test coverage, meaning that all functionality was written because an earlier test case demanded it. We are certain that all official scenarios are tested and we even added a few tests for unofficial edge cases such as when games or sets aren&#39;t completed. However like every piece of code the &quot;absence of proof&quot; is not &quot;proof of absence&quot;.</li>
+					<li><strong>Q:</strong> Can I use the library in javascript instead of typescript?<br><strong>A:</strong> Yes, the library is compiled to javascript from typescript without any dependencies. The example only uses typescript as it better displays the functionality.</li>
+				</ul>
+				<a href="#example" id="example" style="color: inherit; text-decoration: none;">
+					<h2>Example</h2>
+				</a>
+				<pre><code class="language-ts"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span>
+<span style="color: #000000">  </span><span style="color: #001080">TTMatch</span><span style="color: #000000">,              </span><span style="color: #008000">// The type that contains all the match data</span>
+<span style="color: #000000">  </span><span style="color: #001080">parseSetScore</span><span style="color: #000000">,        </span><span style="color: #008000">// An easy to use function for adding sets</span>
+<span style="color: #000000">  </span><span style="color: #001080">generateMatchRank</span><span style="color: #000000">     </span><span style="color: #008000">// The function that generates the ranking</span>
+<span style="color: #000000">} </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;@nttb/tt-match-ranking&quot;</span><span style="color: #000000">;</span>
+
+<span style="color: #008000">////////////////////////////////////////////////////////////////</span>
+<span style="color: #008000">// 0. You can create your own player-information (or just use a string).</span>
+<span style="color: #0000FF">interface</span><span style="color: #000000"> </span><span style="color: #267F99">MyPlayerType</span><span style="color: #000000"> {</span>
+<span style="color: #000000">  </span><span style="color: #001080">name</span><span style="color: #000000">: </span><span style="color: #267F99">string</span><span style="color: #000000">;</span>
+<span style="color: #000000">  </span><span style="color: #001080">club</span><span style="color: #000000">: </span><span style="color: #267F99">string</span><span style="color: #000000">;</span>
+<span style="color: #000000">}</span>
+
+<span style="color: #008000">////////////////////////////////////////////////////////////////</span>
+<span style="color: #008000">// 1. Define the match and set rules</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">matchRules</span><span style="color: #000000"> = {</span>
+<span style="color: #000000">  </span><span style="color: #001080">victoryPoints:</span><span style="color: #000000"> </span><span style="color: #098658">2</span><span style="color: #000000">, </span><span style="color: #008000">// Players get 2 points when they are the winner</span>
+<span style="color: #000000">  </span><span style="color: #001080">defeatPoints:</span><span style="color: #000000"> </span><span style="color: #098658">1</span><span style="color: #000000">   </span><span style="color: #008000">// Players get 1 points when they play and lose...</span>
+<span style="color: #000000">                    </span><span style="color: #008000">// ... so that players that refuse to play are at a bigger disadvantage. </span>
+<span style="color: #000000">};</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">setRules</span><span style="color: #000000"> = {</span>
+<span style="color: #000000">  </span><span style="color: #001080">bestOf:</span><span style="color: #000000"> </span><span style="color: #098658">5</span><span style="color: #000000">,           </span><span style="color: #008000">// A set is won when a player has 3 out of 5 games. </span>
+
+<span style="color: #000000">  </span><span style="color: #001080">gameRules:</span><span style="color: #000000"> {         </span><span style="color: #008000">// A game is won when a player...</span>
+<span style="color: #000000">    </span><span style="color: #001080">scoreMinimum:</span><span style="color: #000000"> </span><span style="color: #098658">11</span><span style="color: #000000">,  </span><span style="color: #008000">// - ... has at least 11 points</span>
+<span style="color: #000000">    </span><span style="color: #001080">scoreDistance:</span><span style="color: #000000"> </span><span style="color: #098658">2</span><span style="color: #000000">,  </span><span style="color: #008000">// - ... has at least 2 points advantage </span>
+<span style="color: #000000">  }</span>
+<span style="color: #000000">};</span>
+
+<span style="color: #008000">////////////////////////////////////////////////////////////////</span>
+<span style="color: #008000">// 2. Create the match/tournament.</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">match</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">TTMatch</span><span style="color: #000000">&lt;</span><span style="color: #267F99">MyPlayerType</span><span style="color: #000000">&gt;();</span>
+
+<span style="color: #008000">////////////////////////////////////////////////////////////////</span>
+<span style="color: #008000">// 3. Add the players that are participating.</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">playerA</span><span style="color: #000000"> = </span><span style="color: #001080">match</span><span style="color: #000000">.</span><span style="color: #795E26">addPlayer</span><span style="color: #000000">({ </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;Player A&quot;</span><span style="color: #000000">, </span><span style="color: #001080">club:</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;my-club&quot;</span><span style="color: #000000"> });</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">playerB</span><span style="color: #000000"> = </span><span style="color: #001080">match</span><span style="color: #000000">.</span><span style="color: #795E26">addPlayer</span><span style="color: #000000">({ </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;Player B&quot;</span><span style="color: #000000">, </span><span style="color: #001080">club:</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;my-club&quot;</span><span style="color: #000000"> });</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">playerC</span><span style="color: #000000"> = </span><span style="color: #001080">match</span><span style="color: #000000">.</span><span style="color: #795E26">addPlayer</span><span style="color: #000000">({ </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;Player C&quot;</span><span style="color: #000000">, </span><span style="color: #001080">club:</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;my-club&quot;</span><span style="color: #000000"> });</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">playerD</span><span style="color: #000000"> = </span><span style="color: #001080">match</span><span style="color: #000000">.</span><span style="color: #795E26">addPlayer</span><span style="color: #000000">({ </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;Player D&quot;</span><span style="color: #000000">, </span><span style="color: #001080">club:</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;my-club&quot;</span><span style="color: #000000"> });</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">playerE</span><span style="color: #000000"> = </span><span style="color: #001080">match</span><span style="color: #000000">.</span><span style="color: #795E26">addPlayer</span><span style="color: #000000">({ </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;Player E&quot;</span><span style="color: #000000">, </span><span style="color: #001080">club:</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;my-club&quot;</span><span style="color: #000000"> });</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">playerF</span><span style="color: #000000"> = </span><span style="color: #001080">match</span><span style="color: #000000">.</span><span style="color: #795E26">addPlayer</span><span style="color: #000000">({ </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;Player F&quot;</span><span style="color: #000000">, </span><span style="color: #001080">club:</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;my-club&quot;</span><span style="color: #000000"> });</span>
+
+<span style="color: #008000">////////////////////////////////////////////////////////////////</span>
+<span style="color: #008000">// 4. Add the played sets</span>
+<span style="color: #008000">// A vs B -- Player A loses in 3 games</span>
+<span style="color: #001080">match</span><span style="color: #000000">.</span><span style="color: #795E26">addSet</span><span style="color: #000000">(</span><span style="color: #001080">playerA</span><span style="color: #000000">, </span><span style="color: #001080">playerB</span><span style="color: #000000">, </span><span style="color: #795E26">parseSetScore</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;0-11,0-11,0-11&quot;</span><span style="color: #000000">));</span>
+<span style="color: #008000">// A vs C -- Player A wins in 4 games</span>
+<span style="color: #001080">match</span><span style="color: #000000">.</span><span style="color: #795E26">addSet</span><span style="color: #000000">(</span><span style="color: #001080">playerA</span><span style="color: #000000">, </span><span style="color: #001080">playerC</span><span style="color: #000000">, </span><span style="color: #795E26">parseSetScore</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;0-11,11-0,11-0,11-0&quot;</span><span style="color: #000000">));</span>
+<span style="color: #008000">// A vs D -- Player A loses in 5 games.</span>
+<span style="color: #001080">match</span><span style="color: #000000">.</span><span style="color: #795E26">addSet</span><span style="color: #000000">(</span><span style="color: #001080">playerA</span><span style="color: #000000">, </span><span style="color: #001080">playerD</span><span style="color: #000000">, </span><span style="color: #795E26">parseSetScore</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;0-11,11-0,0-11,11-0,0-11&quot;</span><span style="color: #000000">));</span>
+<span style="color: #008000">// A vs E -- Player A wins because player E refuses to play</span>
+<span style="color: #001080">match</span><span style="color: #000000">.</span><span style="color: #795E26">addSet</span><span style="color: #000000">(</span><span style="color: #001080">playerA</span><span style="color: #000000">, </span><span style="color: #001080">playerE</span><span style="color: #000000">, </span><span style="color: #795E26">parseSetScore</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;wo:home&quot;</span><span style="color: #000000">));</span>
+<span style="color: #008000">// A vs F -- Unknown result, as the set has no clear winner.</span>
+<span style="color: #001080">match</span><span style="color: #000000">.</span><span style="color: #795E26">addSet</span><span style="color: #000000">(</span><span style="color: #001080">playerA</span><span style="color: #000000">, </span><span style="color: #001080">playerF</span><span style="color: #000000">, </span><span style="color: #795E26">parseSetScore</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;0-11&quot;</span><span style="color: #000000">));</span>
+
+<span style="color: #008000">////////////////////////////////////////////////////////////////</span>
+<span style="color: #008000">// 5. Calculate the ranking</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">ranking</span><span style="color: #000000"> = </span><span style="color: #795E26">generateMatchRank</span><span style="color: #000000">(</span><span style="color: #001080">match</span><span style="color: #000000">, </span><span style="color: #001080">matchRules</span><span style="color: #000000">, </span><span style="color: #001080">setRules</span><span style="color: #000000">);</span>
+
+<span style="color: #008000">////////////////////////////////////////////////////////////////</span>
+<span style="color: #008000">// X. Display the ranking</span>
+<span style="color: #001080">ranking</span><span style="color: #000000">.</span><span style="color: #001080">ranked</span><span style="color: #000000">.</span><span style="color: #795E26">forEach</span><span style="color: #000000">((</span><span style="color: #001080">rank</span><span style="color: #000000">, </span><span style="color: #001080">i</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #000000">  </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">pos</span><span style="color: #000000"> = </span><span style="color: #001080">i</span><span style="color: #000000"> + </span><span style="color: #098658">1</span><span style="color: #000000">;</span>
+<span style="color: #000000">  </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #A31515">`</span><span style="color: #0000FF">${</span><span style="color: #001080">pos</span><span style="color: #0000FF">}</span><span style="color: #A31515">. </span><span style="color: #0000FF">${</span><span style="color: #001080">rank</span><span style="color: #000000FF">.</span><span style="color: #001080">player</span><span style="color: #000000FF">.</span><span style="color: #001080">name</span><span style="color: #0000FF">}</span><span style="color: #A31515">`</span><span style="color: #000000">)</span>
+<span style="color: #000000">})</span>
+</code></pre>
+			</div>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class=" ">
+						<a href="modules.html">Exports</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+					<li class=" tsd-kind-class tsd-has-type-parameter">
+						<a href="classes/ttmatch.html" class="tsd-kind-icon">TTMatch</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/ttgame.html" class="tsd-kind-icon">TTGame</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/ttgamerules.html" class="tsd-kind-icon">TTGame<wbr>Rules</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/ttmatchrank.html" class="tsd-kind-icon">TTMatch<wbr>Rank</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/ttmatchrules.html" class="tsd-kind-icon">TTMatch<wbr>Rules</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/ttmatchset.html" class="tsd-kind-icon">TTMatch<wbr>Set</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/ttplayerrank.html" class="tsd-kind-icon">TTPlayer<wbr>Rank</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/ttset.html" class="tsd-kind-icon">TTSet</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/ttsetrules_bestof.html" class="tsd-kind-icon">TTSet<wbr>Rules_<wbr><wbr>Best<wbr>Of</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="modules.html#ttsetrules" class="tsd-kind-icon">TTSet<wbr>Rules</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#assertgamerules" class="tsd-kind-icon">assert<wbr>Game<wbr>Rules</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#assertmatchrules" class="tsd-kind-icon">assert<wbr>Match<wbr>Rules</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#assertsetrules" class="tsd-kind-icon">assert<wbr>Set<wbr>Rules</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter">
+						<a href="modules.html#generatematchrank" class="tsd-kind-icon">generate<wbr>Match<wbr>Rank</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#parsegamescore" class="tsd-kind-icon">parse<wbr>Game<wbr>Score</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#parsesetscore" class="tsd-kind-icon">parse<wbr>Set<wbr>Score</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="assets/js/main.js"></script>
+</body>
+</html>
