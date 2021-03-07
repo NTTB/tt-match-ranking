@@ -66,6 +66,14 @@ describe("Scenario 6", () => {
     expect(ranking.ranked[rank - 1].player).toBe(player);
   });
 
+  it.each(["A", "B", "C", "D", "E", "F"])(
+    "Player %p doesn't share its position",
+    (player) => {
+      const rank = ranking.ranked.find((x) => x.player == player);
+      expect(rank?.sharedWith).toHaveLength(0);
+    }
+  );
+
   test.each`
     player | points
     ${"A"} | ${3}

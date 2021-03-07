@@ -54,6 +54,36 @@ describe("Scenario 7", () => {
     });
   });
 
+  it.each`
+    player | sharedWith
+    ${"A"} | ${["B", "C"]}
+    ${"B"} | ${["A", "C"]}
+    ${"C"} | ${["A", "B"]}
+    ${"D"} | ${[]}
+    ${"E"} | ${[]}
+    ${"F"} | ${[]}
+  `(
+    "Player $player shares its position with $sharedWith",
+    ({ player, sharedWith }) => {
+      const rank = ranking.ranked.find((x) => x.player == player);
+      expect(rank?.sharedWith).toHaveLength(sharedWith.length);
+      sharedWith.forEach((otherPlayer: string) => {
+        const otherPlayerId = match
+          .getPlayers()
+          .find((x) => x.player === otherPlayer)?.id;
+        expect(rank?.sharedWith).toContain(otherPlayerId);
+      });
+    }
+  );
+
+  it.each(["D", "E", "F"])(
+    "Player %p doesn't share its rank position",
+    (player) => {
+      const rank = ranking.ranked.find((x) => x.player == player);
+      expect(rank?.sharedWith).toHaveLength(0);
+    }
+  );
+
   test.each`
     player | rank
     ${"A"} | ${1}

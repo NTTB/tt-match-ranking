@@ -15,6 +15,7 @@ export interface TTPlayerRank<T> {
   sameRankScoreRatio: WinLoseRatio;
   sameRankGameRatioEvery: WinLoseRatio;
   sameRankScoreRatioEvery: WinLoseRatio;
+  sharedWith: number[];
 }
 
 interface PointChange {
@@ -48,6 +49,7 @@ export function generateMatchRank<T>(
         sameRankScoreRatio: WinLoseRatio.Zero,
         sameRankGameRatioEvery: WinLoseRatio.Zero,
         sameRankScoreRatioEvery: WinLoseRatio.Zero,
+        sharedWith: [],
       };
     }
   );
@@ -145,6 +147,14 @@ function generateMatchRankStep<T>(
   }
 
   if (stepIndex >= steps.length) {
+    // No more steps, players share the same rank.
+    remaining.forEach((x) => {
+      const otherPlayerIds = remaining
+        .map((y) => y.id)
+        .filter((y) => y !== x.id);
+      x.sharedWith.push(...otherPlayerIds);
+    });
+
     result.ranked.push(...remaining);
     return;
   }

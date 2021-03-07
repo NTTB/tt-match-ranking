@@ -7,6 +7,10 @@ describe("Incomplete scenario", () => {
   let match: TTMatch<string>;
   let p1: number;
   let p2: number;
+  let p3: number;
+  let p4: number;
+  let p5: number;
+  let p6: number;
 
   let matchRules: TTMatchRules;
   let setRules: TTSetRules;
@@ -17,10 +21,10 @@ describe("Incomplete scenario", () => {
     p2 = match.addPlayer("B");
 
     // The following players are added, but not used.
-    match.addPlayer("C");
-    match.addPlayer("F");
-    match.addPlayer("E");
-    match.addPlayer("D");
+    p3 = match.addPlayer("C");
+    p4 = match.addPlayer("F");
+    p5 = match.addPlayer("E");
+    p6 = match.addPlayer("D");
 
     gameRules = { scoreDistance: 2, scoreMinimum: 11 };
     setRules = {
@@ -54,6 +58,36 @@ describe("Incomplete scenario", () => {
 
     it("should have player B be first", () => {
       expect(ranking.ranked[0].player).toBe("B");
+    });
+  });
+
+  test("when no sets have been played then players can't share the same rank", () => {
+    const result = generateMatchRank(
+      match,
+      { victoryPoints: 2, defeatPoints: 1 },
+      { bestOf: 1, gameRules: { scoreDistance: 2, scoreMinimum: 11 } }
+    );
+    expect(result.ranked.length).toBe(6);
+    result.ranked.forEach((rank) => {
+      expect(rank.sharedWith).toHaveLength(0);
+    });
+  });
+
+  test("when every player has won 1 complete set they all share the same rank", () => {
+    match.addSet(p1, p2, parseSetScore("11-0"));
+    match.addSet(p2, p3, parseSetScore("11-0"));
+    match.addSet(p3, p4, parseSetScore("11-0"));
+    match.addSet(p4, p5, parseSetScore("11-0"));
+    match.addSet(p5, p6, parseSetScore("11-0"));
+    match.addSet(p6, p1, parseSetScore("11-0"));
+    const result = generateMatchRank(
+      match,
+      { victoryPoints: 2, defeatPoints: 1 },
+      { bestOf: 1, gameRules: { scoreDistance: 2, scoreMinimum: 11 } }
+    );
+    expect(result.ranked.length).toBe(6);
+    result.ranked.forEach((rank) => {
+      expect(rank.sharedWith).toHaveLength(5); // Because we have 5 other players.
     });
   });
 
