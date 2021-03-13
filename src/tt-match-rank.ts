@@ -9,6 +9,12 @@ import { TTMatch, TTMatchSet } from "./tt-match";
 export interface TTMatchRank<T> {
   /** The players sorted by rank */
   ranked: TTPlayerRank<T>[];
+
+  /**
+   * The sets that are used in the calculating the ranking.
+   * Only sets of ranked players are included.
+   */
+  rankedSets: TTMatchSet[];
 }
 
 /**
@@ -179,6 +185,12 @@ export function generateMatchRank<T>(
 
   const result: TTMatchRank<T> = {
     ranked: [],
+    rankedSets: filterSets(
+      match.getSets(),
+      "between",
+      rankedPlayers.map((x) => x.id),
+      setRules
+    ),
   };
 
   generateMatchRankStep<T>(
@@ -304,16 +316,48 @@ function filterSets(
 }
 
 function splitRankedAndUnranked<T>(match: TTMatch<T>) {
-  const hasTooManyUnplayedMatches: number[] = getPlayersWithTooManyUnplayedMatches<T>(
-    match
-  );
+  // Only players that caused a walk over can be removed from the match.
+  const canBeStrikedPlayers: number[] = [];
+
+  match.getSets().forEach((x) => {
+    if (
+      x.set.walkover == "home" &&
+      !canBeStrikedPlayers.includes(x.awayPlayerId)
+    ) {
+      canBeStrikedPlayers.push(x.awayPlayerId);
+    }
+    if (
+      x.set.walkover == "away" &&
+      !canBeStrikedPlayers.includes(x.homePlayerId)
+    ) {
+      canBeStrikedPlayers.push(x.homePlayerId);
+    }
+  });
+  const strikePlayers: number[] = [];
+
+  canBeStrikedPlayers.forEach((pId) => {
+    const setsWithPlayer = match
+      .getSets()
+      .filter((x) => x.homePlayerId == pId || x.awayPlayerId == pId);
+
+    const playedSets = setsWithPlayer.filter(
+      (x) => x.set.walkover === undefined
+    ).length;
+
+    const notEnoughPlayedSets = playedSets <= setsWithPlayer.length / 2;
+    if (notEnoughPlayedSets) {
+      strikePlayers.push(pId);
+    }
+  });
+
   const rankedPlayers = match
     .getPlayers()
-    .filter((x) => !hasTooManyUnplayedMatches.includes(x.id));
+    .filter((p) => !strikePlayers.includes(p.id));
 
   const unrankedPlayers = match
     .getPlayers()
-    .filter((p) => !rankedPlayers.some((rp) => rp.id === p.id));
+    .filter((p) => strikePlayers.includes(p.id));
+
   return { unrankedPlayers, rankedPlayers };
 }
 
@@ -396,32 +440,4 @@ function getPointChanges(
   });
 
   return pointChanges;
-}
-
-function getPlayersWithTooManyUnplayedMatches<T>(match: TTMatch<T>) {
-  const hasTooManyUnplayedMatches: number[] = [];
-
-  match.getPlayers().forEach(({ id }) => {
-    let expectedSetCounter = 0;
-    let unplayedSetCounter = 0;
-    match
-      .getSets()
-      .filter(
-        ({ homePlayerId, awayPlayerId }) =>
-          id === homePlayerId || id === awayPlayerId
-      )
-      .forEach(({ set }) => {
-        expectedSetCounter++;
-
-        if (set.walkover) {
-          unplayedSetCounter++;
-        }
-      });
-
-    const requiredSetCount = Math.ceil(expectedSetCounter / 2);
-    if (unplayedSetCounter > 0 && unplayedSetCounter >= requiredSetCount) {
-      hasTooManyUnplayedMatches.push(id);
-    }
-  });
-  return hasTooManyUnplayedMatches;
 }

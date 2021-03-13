@@ -42,120 +42,6 @@ describe("generateMatchRank(...)", () => {
   });
 
   describe.each`
-    set1         | set2         | set3         | ranked              | unranked
-    ${""}        | ${""}        | ${""}        | ${["home", "away"]} | ${[]}
-    ${"0-0"}     | ${"0-0"}     | ${"0-0"}     | ${["home", "away"]} | ${[]}
-    ${""}        | ${"0-0"}     | ${""}        | ${["home", "away"]} | ${[]}
-    ${""}        | ${""}        | ${"wo:home"} | ${["home", "away"]} | ${[]}
-    ${""}        | ${""}        | ${"wo:away"} | ${["home", "away"]} | ${[]}
-    ${""}        | ${"wo:home"} | ${"wo:home"} | ${[]}               | ${["home", "away"]}
-    ${""}        | ${"wo:away"} | ${"wo:away"} | ${[]}               | ${["home", "away"]}
-    ${"wo:home"} | ${"wo:home"} | ${"wo:home"} | ${[]}               | ${["home", "away"]}
-    ${"wo:away"} | ${"wo:away"} | ${"wo:away"} | ${[]}               | ${["home", "away"]}
-    ${"wo:home"} | ${"wo:home"} | ${"wo:away"} | ${[]}               | ${["home", "away"]}
-    ${"wo:home"} | ${"wo:away"} | ${"wo:away"} | ${[]}               | ${["home", "away"]}
-    ${"wo:home"} | ${""}        | ${"wo:away"} | ${[]}               | ${["home", "away"]}
-  `(
-    "When sets are [$set1, $set2, $set3]",
-    ({ set1, set2, set3, ranked, unranked }) => {
-      beforeEach(() => {
-        const p1 = match.addPlayer("home");
-        const p2 = match.addPlayer("away");
-        match.addSet(p1, p2, parseSetScore(set1));
-        match.addSet(p1, p2, parseSetScore(set2));
-        match.addSet(p1, p2, parseSetScore(set3));
-      });
-
-      test(`${ranked.join(",") || "none"} should be ranked`, () => {
-        const result = generateMatchRank(
-          match,
-          { victoryPoints: 2, defeatPoints: 1 },
-          { bestOf: 1, gameRules: { scoreDistance: 2, scoreMinimum: 11 } }
-        );
-        ranked.forEach((element: "home" | "away") => {
-          expect(result.ranked.map((x) => x.player)).toContain(element);
-        });
-      });
-
-      test(`${unranked.join(",") || "none"} must NOT be ranked`, () => {
-        const result = generateMatchRank(
-          match,
-          { victoryPoints: 2, defeatPoints: 1 },
-          { bestOf: 1, gameRules: { scoreDistance: 2, scoreMinimum: 11 } }
-        );
-        unranked.forEach((element: "home" | "away") => {
-          expect(result.ranked.map((x) => x.player)).not.toContain(element);
-        });
-      });
-    }
-  );
-
-  describe.each`
-    s1_2         | s1_3         | s1_4         | s2_3         | s2_4         | s3_4         | ranked    | unranked
-    ${"wo:home"} | ${"wo:home"} | ${"wo:home"} | ${"wo:home"} | ${"wo:home"} | ${"wo:home"} | ${""}     | ${"ABCD"}
-    ${"0-11"}    | ${"0-11"}    | ${"0-11"}    | ${"0-11"}    | ${"0-11"}    | ${"0-11"}    | ${"ABCD"} | ${""}
-    ${"wo:home"} | ${"wo:home"} | ${"wo:home"} | ${"0-11"}    | ${"0-11"}    | ${"0-11"}    | ${"BCD"}  | ${"A"}
-    ${"wo:away"} | ${"wo:away"} | ${"wo:away"} | ${"0-11"}    | ${"0-11"}    | ${"0-11"}    | ${"BCD"}  | ${"A"}
-    ${"wo:away"} | ${"wo:away"} | ${"wo:away"} | ${"wo:away"} | ${"0-11"}    | ${"0-11"}    | ${"D"}    | ${"ABC"}
-  `(
-    "Given sets are [$s1_2, $s1_3, $s1_4, $s2_3, $s2_4, $s3_4]",
-    ({
-      s1_2,
-      s1_3,
-      s1_4,
-      s2_3,
-      s2_4,
-      s3_4,
-      ranked,
-      unranked,
-    }: {
-      s1_2: string;
-      s1_3: string;
-      s1_4: string;
-      s2_3: string;
-      s2_4: string;
-      s3_4: string;
-      ranked: string;
-      unranked: string;
-    }) => {
-      match = new TTMatch<string>();
-      const p1 = match.addPlayer("A");
-      const p2 = match.addPlayer("B");
-      const p3 = match.addPlayer("C");
-      const p4 = match.addPlayer("D");
-      match.addSet(p1, p2, parseSetScore(s1_2));
-      match.addSet(p1, p3, parseSetScore(s1_3));
-      match.addSet(p1, p4, parseSetScore(s1_4));
-      match.addSet(p2, p3, parseSetScore(s2_3));
-      match.addSet(p2, p4, parseSetScore(s2_4));
-      match.addSet(p3, p4, parseSetScore(s3_4));
-      const result = generateMatchRank(
-        match,
-        { victoryPoints: 2, defeatPoints: 1 },
-        { bestOf: 1, gameRules: { scoreDistance: 2, scoreMinimum: 11 } }
-      );
-
-      for (let i = 0; i < ranked.length; ++i) {
-        const player = ranked[i];
-        test(`player ${player} should be ranked`, () => {
-          expect(result.ranked.map((x) => x.player)).toContain(player);
-        });
-      }
-
-      for (let i = 0; i < unranked.length; ++i) {
-        const player = unranked[i];
-        test(`player ${player} should NOT be ranked`, () => {
-          expect(result.ranked.map((x) => x.player)).not.toContain(player);
-        });
-      }
-
-      test(`total ranked players should be ${ranked.length}`, () => {
-        expect(result.ranked).toHaveLength(ranked.length);
-      });
-    }
-  );
-
-  describe.each`
     a_vs_b    | order
     ${"11-0"} | ${["A", "B"]}
     ${"0-11"} | ${["B", "A"]}
@@ -189,12 +75,15 @@ describe("generateMatchRank(...)", () => {
     });
   });
 
+  // Two specials scenarios:
+  // Scenario 4: No sets are played
+  // Scenario 5: One set was a walk-over, which means a player got 0 points instead of defeatpoints
   describe.each`
     a_vs_b    | a_vs_c    | a_vs_d    | b_vs_c    | b_vs_d    | c_vs_d       | rankedOrder | VPA  | VPB  | VPC  | VPD
-    ${""}     | ${""}     | ${""}     | ${""}     | ${""}     | ${""}        | ${"ABCD"}   | ${0} | ${0} | ${0} | ${0}
     ${"0-11"} | ${"0-11"} | ${"0-11"} | ${"0-11"} | ${"0-11"} | ${"0-11"}    | ${"DCBA"}   | ${3} | ${4} | ${5} | ${6}
     ${"11-0"} | ${"0-11"} | ${"11-0"} | ${"11-0"} | ${"11-0"} | ${"0-11"}    | ${"ABDC"}   | ${5} | ${5} | ${4} | ${4}
     ${"0-11"} | ${"11-0"} | ${"11-0"} | ${"11-0"} | ${"0-11"} | ${"0-11"}    | ${"ABDC"}   | ${5} | ${5} | ${3} | ${5}
+    ${""}     | ${""}     | ${""}     | ${""}     | ${""}     | ${""}        | ${"ABCD"}   | ${0} | ${0} | ${0} | ${0}
     ${"0-11"} | ${"11-0"} | ${"11-0"} | ${"11-0"} | ${"0-11"} | ${"wo:away"} | ${"BADC"}   | ${5} | ${5} | ${2} | ${5}
   `(
     "Rank order of four players [$a_vs_b, $a_vs_c, $a_vs_d, $b_vs_c, $b_vs_d, $c_vs_d]",
