@@ -100,3 +100,15 @@ ranking.ranked.forEach((rank, i) => {
   console.log(`${pos}. ${rank.player.name}`)
 })
 ```
+
+
+## Versions
+
+### 1.0.0 - Initial release
+
+- This is the initial release
+
+### 1.0.1 - Correct the ranked/unranked players
+
+- fixed: Before a player would be unranked when a player only has walkovers. Now that player will be ranked first.
+- new: Ranked sets are also included in the result. This is often needed when determing the total win/lose ratio in the ranking.
